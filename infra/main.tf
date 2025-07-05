@@ -1,10 +1,7 @@
-
 # ------------------------------------------------------------------------------
-
-
-
 # VPC
 # ------------------------------------------------------------------------------
+
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.1.0"
@@ -19,7 +16,6 @@ module "vpc" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 }
-
 
 # ------------------------------------------------------------------------------
 # RDS - PostgreSQL instance
@@ -46,10 +42,10 @@ module "rds" {
   skip_final_snapshot    = true
 }
 
-
 # ------------------------------------------------------------------------------
 # Route53 
 # ------------------------------------------------------------------------------
+
 resource "aws_route53_zone" "main" {
   name = var.domain_name
   comment = var.zone_comment
@@ -75,6 +71,7 @@ resource "aws_route53_record" "frontend_alias" {
 # ------------------------------------------------------------------------------
 # ACM Certificate - validated via Route53
 # ------------------------------------------------------------------------------
+
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "4.2.0"
@@ -102,15 +99,18 @@ resource "aws_route53_record" "cert_validation" {
   records = [each.value.record]
 }
 
-
 resource "aws_acm_certificate_validation" "cert" {
   certificate_arn         = module.acm.acm_certificate_arn
   validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+  depends_on = [
+    aws_route53_record.cert_validation
+  ]
 }
 
 # ------------------------------------------------------------------------------
 # S3 Bucket for Frontend
 # ------------------------------------------------------------------------------
+
 module "frontend_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "3.15.1"
@@ -127,6 +127,7 @@ module "frontend_bucket" {
 # ------------------------------------------------------------------------------
 # CloudFront - uses ACM cert
 # ------------------------------------------------------------------------------
+
 module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
   version = "3.2.0"
@@ -154,8 +155,6 @@ module "cloudfront" {
     compress               = true
   }
 }
-
-
 
 # ------------------------------------------------------------------------------
 # Lambda Function
@@ -188,6 +187,7 @@ module "cloudfront" {
   create_role = true
 }
 */
+
 resource "aws_iam_role" "lambda_exec" {
   name = "redroom-lambda-exec"
 
@@ -228,7 +228,7 @@ resource "aws_lambda_function" "this" {
   }
 
   lifecycle {
-    ignore_changes = [image_uri] # optional if image is updated externally
+    ignore_changes = [image_uri]
   }
 }
 
@@ -303,4 +303,3 @@ resource "aws_apigatewayv2_stage" "default" {
   name        = "$default"
   auto_deploy = true
 }
-
