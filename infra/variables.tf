@@ -54,12 +54,13 @@ variable "rds_db_name" {
   type        = string
 }
 
-variable "rds_username" {
+variable "RDS_USERNAME" {
   description = "Master username for RDS"
   type        = string
+  sensitive   = true
 }
 
-variable "rds_password" {
+variable "RDS_PASSWORD" {
   description = "Master password for RDS"
   type        = string
   sensitive   = true
