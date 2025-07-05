@@ -3,14 +3,14 @@ variable "aws_region" {
   type        = string
 }
 
-variable "azs" {
-  description = "A list of availability zones in the region"
-  type        = list(string)
-}
-
 variable "project_name" {
   description = "Name prefix for resources"
   type        = string
+}
+
+variable "azs" {
+  description = "A list of availability zones in the region"
+  type        = list(string)
 }
 
 variable "vpc_cidr" {
@@ -38,6 +38,11 @@ variable "subdomain" {
   type        = string
 }
 
+variable "zone_comment" {
+  description = "Optional comment for the hosted zone"
+  type        = string
+  default     = "Managed by Terraform"
+}
 
 variable "rds_instance_class" {
   description = "Instance class for RDS"
@@ -70,10 +75,6 @@ variable "lambda_timeout" {
   type        = number
 }
 
-variable "lambda_runtime" {
-  description = "Runtime for backend Lambda"
-  type        = string
-}
 
 variable "frontend_bucket_name" {
   description = "S3 bucket name for frontend static files"
@@ -98,9 +99,4 @@ variable "tags" {
     Project     = "RedRoomSim"
     Environment = "Development"
   }
-}
-
-variable "hosted_zone_id" {
-  description = "Route53 hosted zone ID for the domain"
-  type        = string
 }

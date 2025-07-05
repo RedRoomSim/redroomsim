@@ -50,8 +50,18 @@ module "rds" {
 # ------------------------------------------------------------------------------
 # Route53 
 # ------------------------------------------------------------------------------
+resource "aws_route53_zone" "main" {
+  name = var.domain_name
+  comment = var.zone_comment
+
+  tags = {
+    Environment = "production"
+    ManagedBy   = "Terraform"
+  }
+}
+
 resource "aws_route53_record" "frontend_alias" {
-  zone_id = var.hosted_zone_id
+  zone_id = aws_route53_zone.main.zone_id
   name    = var.domain_name
   type    = "A"
 
@@ -70,7 +80,7 @@ module "acm" {
   version = "4.1.0"
 
   domain_name = var.domain_name
-  zone_id     = var.hosted_zone_id
+  zone_id     = aws_route53_zone.main.zone_id
 
   validation_method = "DNS"
 }
