@@ -37,8 +37,8 @@ module "rds" {
   allocated_storage = 20
 
   db_name  = var.rds_db_name
-  username = var.rds_username
-  password = var.rds_password
+  username = var.RDS_USERNAME
+  password = var.RDS_PASSWORD
 
   vpc_security_group_ids = [module.vpc.default_security_group_id]
   subnet_ids             = module.vpc.private_subnets
