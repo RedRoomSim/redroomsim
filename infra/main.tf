@@ -188,9 +188,32 @@ module "cloudfront" {
   create_role = true
 }
 */
+resource "aws_iam_role" "lambda_exec" {
+  name = "redroom-lambda-exec"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "lambda_logs" {
+  name       = "attach-lambda-logs"
+  roles      = [aws_iam_role.lambda_exec.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
 resource "aws_lambda_function" "this" {
   function_name = "redroom-fastapi"
-  role          = aws_iam_role.lambda[0].arn
+  role          = aws_iam_role.lambda_exec.arn
   package_type  = "Image"
 
   image_uri = module.ecr.repository_url
@@ -255,7 +278,7 @@ module "apigateway" {
 resource "aws_apigatewayv2_integration" "lambda" {
   api_id                 = module.apigateway.apigatewayv2_api_id
   integration_type       = "AWS_PROXY"
-  integration_uri        = module.lambda_docker.lambda_function_invoke_arn
+  integration_uri        = aws_lambda_function.this.invoke_arn
   integration_method     = "POST"
   payload_format_version = "2.0"
   timeout_milliseconds   = 30000
@@ -270,7 +293,7 @@ resource "aws_apigatewayv2_route" "default" {
 resource "aws_lambda_permission" "allow_apigateway" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = module.lambda_docker.lambda_function_name
+  function_name = aws_lambda_function.this.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${module.apigateway.apigatewayv2_api_execution_arn}/*/*"
 }
