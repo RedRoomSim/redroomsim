@@ -9,3 +9,7 @@ output "api_gateway_url" {
 output "cloudfront_distribution_id" {
   value = module.cloudfront.cloudfront_distribution_id
 }
+
+output "cloudfront_app_url" {
+  value = module.cloudfront.cloudfront_distribution_domain_name
+}

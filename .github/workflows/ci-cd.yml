@@ -1,0 +1,86 @@
+name: Deploy Infrastructure and Frontend
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy Infra + Frontend
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: us-west-2
+      TF_VAR_RDS_USERNAME: ${{ secrets.TF_VAR_RDS_USERNAME }}
+      TF_VAR_RDS_PASSWORD: ${{ secrets.TF_VAR_RDS_PASSWORD }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13.3'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ----------------------
+      # Terraform Deployment
+      # ----------------------
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: ./infra
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: ./infra
+        run: terraform plan
+
+      - name: Terraform Apply
+        working-directory: ./infra
+        run: terraform apply
+
+      - name: Terraform Output
+        id: tf_output
+        working-directory: ./infra
+        run: |
+          terraform output -raw cloudfront_distribution_id > cloudfront_id.txt
+
+      - name: Load CloudFront ID
+        id: load_cf
+        run: |
+          echo "CLOUDFRONT_ID=$(cat ./infra/cloudfront_id.txt)" >> $GITHUB_ENV
+
+      # ----------------------
+      # React Frontend Build + Deploy
+      # ----------------------
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Build React app
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync ./frontend/dist s3://redroomsim-frontend-bucket --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id $CLOUDFRONT_ID \
+            --paths "/*"
