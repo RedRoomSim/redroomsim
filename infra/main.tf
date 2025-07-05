@@ -32,10 +32,10 @@ module "rds" {
   identifier = "redroom-db"
 
   engine            = "postgres"
-  engine_version    = "14.6"
+  engine_version    = "15.3"
   instance_class    = "db.t3.micro"
   allocated_storage = 20
-
+  family = "postgres15"
   db_name  = var.rds_db_name
   username = var.RDS_USERNAME
   password = var.RDS_PASSWORD
@@ -106,44 +106,32 @@ module "frontend_bucket" {
 # ------------------------------------------------------------------------------
 module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
-  version = "3.3.0"
+  version = "3.2.0"
+
+  comment = "Frontend CDN"
+
+  enabled = true
 
   aliases = [var.domain_name]
 
   default_root_object = "index.html"
-  enabled             = true
 
   origin = {
-    domain_name = module.frontend_bucket.s3_bucket_website_endpoint
-    origin_id   = "frontend"
-    custom_origin_config = {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
+    frontend = {
+      domain_name = module.frontend_bucket.s3_bucket_website_endpoint
+      origin_id   = "frontend-origin"
     }
   }
 
   default_cache_behavior = {
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "frontend"
-
-    forwarded_values = {
-      query_string = false
-      cookies = {
-        forward = "none"
-      }
-    }
-
+    target_origin_id       = "frontend-origin"
     viewer_protocol_policy = "redirect-to-https"
-  }
-
-  viewer_certificate = {
-    acm_certificate_arn      = module.acm.acm_certificate_arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
   }
 }
+
 
 
 # ------------------------------------------------------------------------------
@@ -151,7 +139,7 @@ module "cloudfront" {
 # ------------------------------------------------------------------------------
 module "lambda_docker" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "5.2.0"
+  version = "6.1.0"
 
   function_name = "redroom-fastapi"
   description   = "FastAPI deployed as Lambda using Docker"
@@ -162,7 +150,7 @@ module "lambda_docker" {
 
   image_uri    = module.ecr.repository_url
   package_type = "Image"
-
+  source_path  = "fastapi-lambda/app"
   environment_variables = {
     STAGE = "prod"
   }
@@ -218,6 +206,7 @@ module "apigateway" {
 
   name          = "redroom-api"
   protocol_type = "HTTP"
+  create_api_domain_name = false 
 }
 
 resource "aws_apigatewayv2_integration" "lambda" {
