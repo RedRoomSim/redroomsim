@@ -160,7 +160,7 @@ module "cloudfront" {
 # ------------------------------------------------------------------------------
 # Lambda Function
 # ------------------------------------------------------------------------------
-module "lambda_docker" {
+/*module "lambda_docker" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.1.0"
 
@@ -187,7 +187,27 @@ module "lambda_docker" {
   ]
   create_role = true
 }
+*/
+resource "aws_lambda_function" "this" {
+  function_name = "redroom-fastapi"
+  role          = aws_iam_role.lambda[0].arn
+  package_type  = "Image"
 
+  image_uri = module.ecr.repository_url
+
+  timeout     = 30
+  memory_size = 512
+
+  environment {
+    variables = {
+      STAGE = "prod"
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [image_uri] # optional if image is updated externally
+  }
+}
 
 module "ecr" {
   source  = "terraform-aws-modules/ecr/aws"
