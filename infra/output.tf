@@ -13,3 +13,8 @@ output "cloudfront_distribution_id" {
 output "cloudfront_app_url" {
   value = module.cloudfront.cloudfront_distribution_domain_name
 }
+
+output "validated_cert_arn" {
+  description = "ACM certificate ARN (validated)"
+  value       = aws_acm_certificate_validation.cert.certificate_arn
+}

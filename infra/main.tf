@@ -77,12 +77,35 @@ resource "aws_route53_record" "frontend_alias" {
 # ------------------------------------------------------------------------------
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
-  version = "4.1.0"
+  version = "4.2.0"
 
-  domain_name = var.domain_name
-  zone_id     = aws_route53_zone.main.zone_id
+  domain_name               = var.domain_name
+  validation_method         = "DNS"
+  create_route53_records    = false
+  wait_for_validation       = false
+  create_certificate        = true
+}
 
-  validation_method = "DNS"
+resource "aws_route53_record" "cert_validation" {
+  for_each = {
+    for dvo in module.acm.acm_certificate_domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      type   = dvo.resource_record_type
+      record = dvo.resource_record_value
+    }
+  }
+
+  zone_id = aws_route53_zone.main.zone_id
+  name    = each.value.name
+  type    = each.value.type
+  ttl     = 60
+  records = [each.value.record]
+}
+
+
+resource "aws_acm_certificate_validation" "cert" {
+  certificate_arn         = module.acm.acm_certificate_arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
 }
 
 # ------------------------------------------------------------------------------
