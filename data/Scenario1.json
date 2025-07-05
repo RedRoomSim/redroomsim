@@ -1,0 +1,119 @@
+{
+  "scenario_id": "ransomware-extended-010",
+  "name": "Enterprise Ransomware Attack Simulation",
+  "description": "Simulating a full ransomware attack against an enterprise environment, from initial compromise to recovery.",
+  "type": "Ransomware",
+  "difficulty": "Hard",
+  "steps": [
+    {
+      "id": 1,
+      "title": "Suspicious Email",
+      "description": "An employee receives an email from 'admin@corp-support.io' asking them to review an invoice attachment. What should you advise?",
+      "options": [
+        "Open it only if it's from someone they know",
+        "Forward it to IT and avoid opening",
+        "Click to see if antivirus blocks it"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 2,
+      "title": "Macro Execution",
+      "description": "The user opens the attachment and enables macros. EDR flags unusual behavior. What’s your immediate response?",
+      "options": [
+        "Shut down the machine remotely",
+        "Start scanning other user inboxes",
+        "Isolate the endpoint and pull memory for analysis"
+      ],
+      "correct_option": 2
+    },
+    {
+      "id": 3,
+      "title": "Persistence Established",
+      "description": "You discover the attacker installed a scheduled task and registry run key. What’s your next step?",
+      "options": [
+        "Delete the files and reboot",
+        "Investigate lateral movement indicators",
+        "Wipe the device"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 4,
+      "title": "Lateral Movement",
+      "description": "There are signs of credential dumping via LSASS. How should you respond?",
+      "options": [
+        "Restart the affected machine",
+        "Initiate a domain-wide credential reset",
+        "Disable antivirus temporarily for deeper forensics"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 5,
+      "title": "Domain Controller Access",
+      "description": "Anomalous behavior is detected on a domain controller. What’s your priority action?",
+      "options": [
+        "Run gpupdate /force to reapply policy",
+        "Remove the DC from the network and alert IR",
+        "Check user group memberships"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 6,
+      "title": "Payload Execution",
+      "description": "Encrypted files and a ransom note appear across endpoints. What’s your organization’s first move?",
+      "options": [
+        "Pay the ransom to recover operations",
+        "Engage legal, IR, and forensics immediately",
+        "Delete the ransomware files manually"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 7,
+      "title": "Communication Strategy",
+      "description": "Leadership wants to inform the public. What’s the recommended step?",
+      "options": [
+        "Make a social media post immediately",
+        "Work with legal and PR to draft an official statement",
+        "Send an internal email blaming the user"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 8,
+      "title": "Backup & Restoration",
+      "description": "You identify unaffected offline backups. What’s the best practice before restoring systems?",
+      "options": [
+        "Format all drives and begin restore",
+        "Ensure network is cleaned and threat is eradicated",
+        "Restore all systems in parallel for speed"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 9,
+      "title": "Regulatory Reporting",
+      "description": "Which agency must you notify if customer data was affected and you’re in the U.S.?",
+      "options": [
+        "CISA or local FBI field office",
+        "Only your ISP",
+        "OSHA"
+      ],
+      "correct_option": 0
+    },
+    {
+      "id": 10,
+      "title": "Post-Incident Hardening",
+      "description": "Which control best reduces the impact of a future ransomware event?",
+      "options": [
+        "Disable email access",
+        "Apply network segmentation and EDR baselining",
+        "Enforce password changes every 7 days"
+      ],
+      "correct_option": 1
+    }
+  ]
+}

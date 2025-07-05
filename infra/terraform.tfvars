@@ -1,0 +1,16 @@
+aws_region            = "us-east-2"
+project_name          = "redroomsim"
+domain_name           = "redroomsim.com"
+subdomain             = "app"
+hosted_zone_id        = ""
+rds_db_name           = "redroomsimdb"
+rds_instance_class    = "db.t3.micro"
+vpc_cidr              = "10.0.0.0/16"
+azs                   = ["us-east-1a", "us-east-1b"]
+public_subnet_cidrs   = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs  = ["10.0.101.0/24", "10.0.102.0/24"]
+lambda_memory_size    = 512
+lambda_timeout        = 30
+frontend_bucket_name  = "redroomsim-frontend-bucket"
+acm_validation_method = "DNS"
+environment           = "development"

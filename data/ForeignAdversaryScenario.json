@@ -1,0 +1,141 @@
+{
+  "scenario_id": "phantom-strike-001",
+  "name": "Phantom Strike – APT29 Intrusion Simulation",
+  "description": "Simulating a sophisticated spear-phishing and credential harvesting campaign by a foreign adversary targeting a U.S. defense contractor.",
+  "type": "Foreign Adversary",
+  "difficulty": "Hard",
+  "steps": [
+    {
+      "id": 1,
+      "title": "Suspicious Email Received",
+      "description": "An employee receives an email from what appears to be a DoD subcontractor requesting invoice validation. The email contains a link to a OneDrive document.",
+      "options": [
+        "Click the link to verify the invoice",
+        "Report the email to the SOC for analysis",
+        "Ignore the email"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 2,
+      "title": "SOC Email Triage",
+      "description": "You’re a SOC Tier 1 analyst reviewing the phishing alert. The email passed SPF but failed DKIM and DMARC. What’s your next step?",
+      "options": [
+        "Escalate to Tier 2 with IOC enrichment request",
+        "Delete the email and notify IT",
+        "Mark the alert as benign"
+      ],
+      "correct_option": 0
+    },
+    {
+      "id": 3,
+      "title": "Alert Correlation",
+      "description": "You pivot to log data and discover multiple users received similar emails within a 2-minute span. One user clicked the link. What should you do?",
+      "options": [
+        "Escalate to IR and begin account review of the affected user",
+        "Delete all affected emails from inboxes",
+        "Send out a phishing awareness reminder"
+      ],
+      "correct_option": 0
+    },
+    {
+      "id": 4,
+      "title": "IOC Validation",
+      "description": "You extract the domain from the email link and check against internal and external threat intelligence. It’s a known malicious C2 from APT29 activity.",
+      "options": [
+        "Add domain to blocklist and send alert to IR",
+        "Flag it for later review",
+        "Create a custom rule to ignore this domain"
+      ],
+      "correct_option": 0
+    },
+    {
+      "id": 5,
+      "title": "Credential Compromise Detected",
+      "description": "Network logs show an anomalous login from a Russian IP to the compromised user’s O365 account within an hour of the phishing email.",
+      "options": [
+        "Reset user password and enable MFA",
+        "Ignore; the IP could be a false positive",
+        "Suspend the user's account and monitor logs"
+      ],
+      "correct_option": 0
+    },
+    {
+      "id": 6,
+      "title": "Lateral Movement",
+      "description": "The adversary attempts to move laterally by accessing shared drives containing procurement data. EDR alerts are triggered.",
+      "options": [
+        "Contain the host and pull forensic images",
+        "Delete the suspicious files",
+        "Send a company-wide alert"
+      ],
+      "correct_option": 0
+    },
+    {
+      "id": 7,
+      "title": "Persistence Mechanism",
+      "description": "You discover a scheduled task and PowerShell backdoor set up to re-establish access after reboots.",
+      "options": [
+        "Delete the task and restart the system",
+        "Reimage the host and update IOC signatures across the fleet",
+        "Block PowerShell execution across the org"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 8,
+      "title": "C2 Infrastructure Analysis",
+      "description": "The malware beacon connects to a domain registered through a known bulletproof hosting provider used by APT29.",
+      "options": [
+        "Contact the registrar to take down the domain",
+        "Add the domain to the blocklist and share IOCs with CISA",
+        "Ignore and focus on internal containment"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 9,
+      "title": "Attribution Assessment",
+      "description": "Indicators of compromise match known APT29 infrastructure, including DNS patterns and malware signatures found in CISA advisories.",
+      "options": [
+        "Attribute the attack to a generic actor",
+        "Attribute the attack to APT29 and notify federal authorities",
+        "Suppress the attribution until a breach disclosure is required"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 10,
+      "title": "Reporting & Disclosure",
+      "description": "Federal regulations require reporting certain breaches involving controlled unclassified information (CUI).",
+      "options": [
+        "Wait until the investigation is fully complete",
+        "Notify the DoD and submit a report to CISA within 72 hours",
+        "Only notify after internal legal review approves"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 11,
+      "title": "Post-Incident Response",
+      "description": "The threat has been neutralized and logs analyzed. What is the best next step?",
+      "options": [
+        "Conduct a tabletop exercise and implement phishing simulation training",
+        "Reassign all users to new teams",
+        "Disable remote access until further notice"
+      ],
+      "correct_option": 0
+    },
+    {
+      "id": 12,
+      "title": "Long-Term Defense Strategy",
+      "description": "You want to improve resilience against similar APT tactics in the future.",
+      "options": [
+        "Implement MFA and disable legacy authentication across the org",
+        "Increase antivirus scan frequency",
+        "Ban email attachments"
+      ],
+      "correct_option": 0
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "scenario_id": "funny-intern-001",
+  "name": "Intern vs. The Firewall",
+  "description": "A well-meaning but dangerously overconfident intern wreaks havoc in your network. Can you undo the damage before the auditors arrive?",
+  "type": "Insider Threat",
+  "difficulty": "Medium",
+  "steps": [
+    {
+      "id": 1,
+      "title": "New Intern Onboarding",
+      "description": "The intern, Chad, has arrived. He introduces himself as 'certified in YouTube tutorials.' What do you do first?",
+      "options": [
+        "Give him admin access to make him feel trusted",
+        "Assign him a read-only test account with no production access",
+        "Let him shadow the CISO for 'real learning'"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 2,
+      "title": "Firewall Incident",
+      "description": "Chad tries to 'optimize network flow' by deleting what he calls 'redundant firewall rules.' What’s your next move?",
+      "options": [
+        "Promote him immediately — he's bold",
+        "Disconnect the machine and notify SecOps",
+        "Ask him to restore from the mysterious backup he made"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 3,
+      "title": "The Slack Breach",
+      "description": "Chad pastes production AWS keys into a public Slack channel labeled #memes. What do you do?",
+      "options": [
+        "Laugh it off — it’s in #memes, no one reads that",
+        "Panic silently while rotating all credentials",
+        "Reply with a “This is fine” GIF"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 4,
+      "title": "The Print Nightmare",
+      "description": "Chad sends 4,000 pages of Rick Astley lyrics to the network printer as a 'harmless prank.' Users can't print now. What’s the fix?",
+      "options": [
+        "Unplug the printer and hold a moment of silence",
+        "Wipe the spooler queue and apply print quotas",
+        "Make him read all 4,000 pages aloud as punishment"
+      ],
+      "correct_option": 1
+    },
+    {
+      "id": 5,
+      "title": "Shadow IT Strikes",
+      "description": "Chad installs an AI assistant called 'HackGPT' to help automate red team tasks. It begins probing internal ports. Your move?",
+      "options": [
+        "Schedule a 1:1 to talk about ethics and firewalls",
+        "Contain the device and investigate for backdoors",
+        "Rename it to 'HelpfulBot' and hope no one notices"
+      ],
+      "correct_option": 1
+    }
+  ]
+}
