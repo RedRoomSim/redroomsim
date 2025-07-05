@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "redroomsimbucket"
+    bucket = "redroomsim-infra-state"
     key    = "terraform/state.tfstate"
     region = "us-east-1"
   }
