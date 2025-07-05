@@ -38,10 +38,6 @@ variable "subdomain" {
   type        = string
 }
 
-variable "certificate_arn" {
-  description = "ARN for the ACM certificate"
-  type        = string
-}
 
 variable "rds_instance_class" {
   description = "Instance class for RDS"
