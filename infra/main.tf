@@ -204,7 +204,7 @@ resource "aws_apigatewayv2_integration" "lambda" {
 
 resource "aws_apigatewayv2_route" "default" {
   api_id    = module.apigateway.apigatewayv2_api_id
-  route_key = "$default"
+  route_key = "default"
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 
