@@ -159,7 +159,7 @@ module "ecr" {
   repository_type   = "private"
 }
 
-resource "aws_secretsmanager_secret" "fastapi_secrets" {
+resource "aws_secretsmanager_secret" "fastapi_secrets-1" {
   name = "fastapi-app-secrets"
 }
 
