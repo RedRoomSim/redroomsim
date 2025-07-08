@@ -28,7 +28,7 @@ module "rds" {
   identifier = "redroom-db"
 
   engine            = "postgres"
-  engine_version    = "15.3"
+  engine_version    = "14.6"
   instance_class    = "db.t3.micro"
   allocated_storage = 20
   family = "postgres15"
@@ -91,10 +91,8 @@ module "cloudfront" {
   origin = [
     {
       domain_name              = "redroomsim-frontend-bucket.s3-website.${var.aws_region}.amazonaws.com"
-      origin_id                = "frontend-origin"
-      origin_path              = ""
-      connection_attempts      = 3
-      connection_timeout       = 10
+      origin_id                = "frontend"
+      origin_ssl_protocol_policy = "https-only"
     }
   ]
 
@@ -191,7 +189,8 @@ module "apigateway" {
 
   name          = "redroom-api"
   protocol_type = "HTTP"
-  create_api_domain_name = false 
+  domain_name   = var.domain_name
+  domain_name_certificate_arn = var.acm_certificate_arn
 }
 
 resource "aws_apigatewayv2_integration" "lambda" {
