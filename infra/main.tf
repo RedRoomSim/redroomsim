@@ -87,7 +87,7 @@ module "cloudfront" {
 
   origin = {
     frontend = {
-      domain_name = module.frontend_bucket.website_endpoint
+      domain_name = module.frontend_bucket.bucket_regional_domain_name
       origin_id   = "frontend-origin"
 
       custom_origin_config = {
@@ -230,7 +230,7 @@ resource "aws_apigatewayv2_stage" "default" {
 }
 
 resource "aws_ecr_lifecycle_policy" "this" {
-  repository = aws_ecr_repository.this.name
+  repository = module.ecr.repository_name
 
   policy = jsonencode({
     rules = [
