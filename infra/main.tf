@@ -46,18 +46,8 @@ module "rds" {
 # Route53 
 # ------------------------------------------------------------------------------
 
-resource "aws_route53_zone" "main" {
-  name = var.domain_name
-  comment = var.zone_comment
-
-  tags = {
-    Environment = "production"
-    ManagedBy   = "Terraform"
-  }
-}
-
 resource "aws_route53_record" "frontend_alias" {
-  zone_id = aws_route53_zone.main.zone_id
+  zone_id = var.hosted_zone_id
   name    = var.domain_name
   type    = "A"
 
@@ -66,45 +56,6 @@ resource "aws_route53_record" "frontend_alias" {
     zone_id                = module.cloudfront.cloudfront_distribution_hosted_zone_id
     evaluate_target_health = false
   }
-}
-
-# ------------------------------------------------------------------------------
-# ACM Certificate - validated via Route53
-# ------------------------------------------------------------------------------
-
-module "acm" {
-  source  = "terraform-aws-modules/acm/aws"
-  version = "4.2.0"
-
-  domain_name               = var.domain_name
-  validation_method         = "DNS"
-  create_route53_records    = false
-  wait_for_validation       = false
-  create_certificate        = true
-}
-
-resource "aws_route53_record" "cert_validation" {
-  for_each = {
-    for dvo in module.acm.acm_certificate_domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      type   = dvo.resource_record_type
-      record = dvo.resource_record_value
-    }
-  }
-
-  zone_id = aws_route53_zone.main.zone_id
-  name    = each.value.name
-  type    = each.value.type
-  ttl     = 60
-  records = [each.value.record]
-}
-
-resource "aws_acm_certificate_validation" "cert" {
-  certificate_arn         = module.acm.acm_certificate_arn
-  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
-  depends_on = [
-    aws_route53_record.cert_validation
-  ]
 }
 
 # ------------------------------------------------------------------------------
@@ -130,38 +81,50 @@ module "frontend_bucket" {
 
 module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
-  version = "3.2.0"
-
-  comment = "Frontend CDN"
-
-  enabled = true
+  version = "3.3.0"
 
   aliases = [var.domain_name]
 
   default_root_object = "index.html"
+  enabled             = true
 
-  origin = {
-    frontend = {
-      domain_name = module.frontend_bucket.s3_bucket_website_endpoint
-      origin_id   = "frontend-origin"
+  origin = [
+    {
+      domain_name              = "redroomsim-frontend-bucket.s3-website.${var.aws_region}.amazonaws.com"
+      origin_id                = "frontend-origin"
+      origin_path              = ""
+      connection_attempts      = 3
+      connection_timeout       = 10
     }
-  }
+  ]
 
   default_cache_behavior = {
-    target_origin_id       = "frontend-origin"
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "frontend"
+
+    forwarded_values = {
+      query_string = false
+      cookies = {
+        forward = "none"
+      }
+    }
+
     viewer_protocol_policy = "redirect-to-https"
-    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
-    cached_methods         = ["GET", "HEAD"]
-    compress               = true
+  }
+
+  viewer_certificate = {
+    acm_certificate_arn      = var.acm_certificate_arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 }
-
 # ------------------------------------------------------------------------------
 # Lambda Function
 # ------------------------------------------------------------------------------
-/*module "lambda_docker" {
+module "lambda_docker" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "6.1.0"
+  version = "5.2.0"
 
   function_name = "redroom-fastapi"
   description   = "FastAPI deployed as Lambda using Docker"
@@ -172,7 +135,7 @@ module "cloudfront" {
 
   image_uri    = module.ecr.repository_url
   package_type = "Image"
-  source_path  = "fastapi-lambda/app"
+  source_path = "fastapi-lambda/app"
   environment_variables = {
     STAGE = "prod"
   }
@@ -185,51 +148,6 @@ module "cloudfront" {
     }
   ]
   create_role = true
-}
-*/
-
-resource "aws_iam_role" "lambda_exec" {
-  name = "redroom-lambda-exec"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_policy_attachment" "lambda_logs" {
-  name       = "attach-lambda-logs"
-  roles      = [aws_iam_role.lambda_exec.name]
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
-
-resource "aws_lambda_function" "this" {
-  function_name = "redroom-fastapi"
-  role          = aws_iam_role.lambda_exec.arn
-  package_type  = "Image"
-
-  image_uri = module.ecr.repository_url
-
-  timeout     = 30
-  memory_size = 512
-
-  environment {
-    variables = {
-      STAGE = "prod"
-    }
-  }
-
-  lifecycle {
-    ignore_changes = [image_uri]
-  }
 }
 
 module "ecr" {
@@ -244,6 +162,7 @@ module "ecr" {
 resource "aws_secretsmanager_secret" "fastapi_secrets" {
   name = "fastapi-app-secrets"
 }
+
 
 # Build & push Docker image with local-exec
 resource "null_resource" "docker_build_push" {
@@ -278,7 +197,7 @@ module "apigateway" {
 resource "aws_apigatewayv2_integration" "lambda" {
   api_id                 = module.apigateway.apigatewayv2_api_id
   integration_type       = "AWS_PROXY"
-  integration_uri        = aws_lambda_function.this.invoke_arn
+  integration_uri        = module.lambda_docker.lambda_function_invoke_arn
   integration_method     = "POST"
   payload_format_version = "2.0"
   timeout_milliseconds   = 30000
@@ -293,7 +212,7 @@ resource "aws_apigatewayv2_route" "default" {
 resource "aws_lambda_permission" "allow_apigateway" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.this.function_name
+  function_name = module.lambda_docker.lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${module.apigateway.apigatewayv2_api_execution_arn}/*/*"
 }

@@ -38,10 +38,14 @@ variable "subdomain" {
   type        = string
 }
 
-variable "zone_comment" {
-  description = "Optional comment for the hosted zone"
+variable "acm_certificate_arn" {
+  description = "ARN for the ACM certificate"
   type        = string
-  default     = "Managed by Terraform"
+}
+
+variable "hosted_zone_id" {
+  description = "Route53 hosted zone ID for the domain"
+  type        = string
 }
 
 variable "rds_instance_class" {
@@ -75,7 +79,6 @@ variable "lambda_timeout" {
   description = "Timeout for backend Lambda"
   type        = number
 }
-
 
 variable "frontend_bucket_name" {
   description = "S3 bucket name for frontend static files"
