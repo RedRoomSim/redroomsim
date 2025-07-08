@@ -81,25 +81,30 @@ module "frontend_bucket" {
 
 module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
-  version = "3.3.0"
+  version = "3.2.1"
 
   aliases = [var.domain_name]
 
-  default_root_object = "index.html"
-  enabled             = true
+  origin = {
+    frontend = {
+      domain_name = module.frontend_bucket.website_endpoint
+      origin_id   = "frontend-origin"
 
-  origin = [
-    {
-      domain_name              = "redroomsim-frontend-bucket.s3-website.${var.aws_region}.amazonaws.com"
-      origin_id                = "frontend"
-      origin_ssl_protocol_policy = "https-only"
+      custom_origin_config = {
+        http_port              = 80
+        https_port             = 443
+        origin_protocol_policy = "http-only"
+        origin_ssl_protocols   = ["TLSv1.2"]
+      }
     }
-  ]
+  }
 
   default_cache_behavior = {
-    allowed_methods  = ["GET", "HEAD"]
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "frontend"
+    target_origin_id = "frontend-origin"
+
+    viewer_protocol_policy = "redirect-to-https"
 
     forwarded_values = {
       query_string = false
@@ -107,16 +112,18 @@ module "cloudfront" {
         forward = "none"
       }
     }
-
-    viewer_protocol_policy = "redirect-to-https"
   }
 
   viewer_certificate = {
-    acm_certificate_arn      = var.acm_certificate_arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
+    acm_certificate_arn = var.acm_certificate_arn
+    ssl_support_method  = "sni-only"
   }
+
+  default_root_object = "index.html"
+  enabled             = true
+  price_class         = "PriceClass_All"
 }
+
 # ------------------------------------------------------------------------------
 # Lambda Function
 # ------------------------------------------------------------------------------
@@ -220,4 +227,25 @@ resource "aws_apigatewayv2_stage" "default" {
   api_id      = module.apigateway.apigatewayv2_api_id
   name        = "default"
   auto_deploy = true
+}
+
+resource "aws_ecr_lifecycle_policy" "this" {
+  repository = aws_ecr_repository.this.name
+
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Retain last 10 images"
+        selection = {
+          tagStatus     = "any"
+          countType     = "imageCountMoreThan"
+          countNumber   = 10
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
 }
