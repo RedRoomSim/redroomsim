@@ -144,7 +144,7 @@ module "lambda_docker" {
   policy_statements = [
     {
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = [aws_secretsmanager_secret.fastapi_secrets.arn]
+      resources = [aws_secretsmanager_secret.fastapi_secrets_1.arn]
     }
   ]
   create_role = true
@@ -159,7 +159,7 @@ module "ecr" {
   repository_type   = "private"
 }
 
-resource "aws_secretsmanager_secret" "fastapi_secrets-1" {
+resource "aws_secretsmanager_secret" "fastapi_secrets_1" {
   name = "fastapi-app-secrets"
 }
 
