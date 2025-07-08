@@ -204,7 +204,7 @@ resource "aws_apigatewayv2_integration" "lambda" {
 
 resource "aws_apigatewayv2_route" "default" {
   api_id    = module.apigateway.apigatewayv2_api_id
-  route_key = "development" # Use a specific route key for development
+  route_key = "$default"
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 
@@ -218,6 +218,6 @@ resource "aws_lambda_permission" "allow_apigateway" {
 
 resource "aws_apigatewayv2_stage" "default" {
   api_id      = module.apigateway.apigatewayv2_api_id
-  name        = "$default"
+  name        = "default"
   auto_deploy = true
 }
