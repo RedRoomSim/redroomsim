@@ -133,21 +133,21 @@ module "lambda_docker" {
   timeout       = 30
   memory_size   = 512
 
-  image_uri    = module.ecr.repository_url
+  #image_uri    = module.ecr.repository_url
   package_type = "Image"
   source_path = "fastapi-lambda/app"
   environment_variables = {
     STAGE = "prod"
   }
 
-  # attach_policy_statements = true
-  # policy_statements = [
-  #   {
-  #     actions   = ["secretsmanager:GetSecretValue"]
-  #     resources = [aws_secretsmanager_secret.fastapi_secrets.arn]
-  #   }
-  # ]
-  # create_role = true
+  attach_policy_statements = true
+  policy_statements = [
+    {
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [aws_secretsmanager_secret.fastapi_secrets.arn]
+    }
+  ]
+  create_role = true
 }
 
 module "ecr" {
@@ -159,9 +159,9 @@ module "ecr" {
   repository_type   = "private"
 }
 
-//resource "aws_secretsmanager_secret" "fastapi_secrets" {
-//  name = "fastapi-app-secrets"
-//}
+resource "aws_secretsmanager_secret" "fastapi_secrets" {
+  name = "fastapi-app-secrets"
+}
 
 
 # Build & push Docker image with local-exec
