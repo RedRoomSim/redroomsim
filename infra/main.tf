@@ -140,14 +140,14 @@ module "lambda_docker" {
     STAGE = "prod"
   }
 
-  attach_policy_statements = true
-  policy_statements = [
-    {
-      actions   = ["secretsmanager:GetSecretValue"]
-      resources = [aws_secretsmanager_secret.fastapi_secrets.arn]
-    }
-  ]
-  create_role = true
+  # attach_policy_statements = true
+  # policy_statements = [
+  #   {
+  #     actions   = ["secretsmanager:GetSecretValue"]
+  #     resources = [aws_secretsmanager_secret.fastapi_secrets.arn]
+  #   }
+  # ]
+  # create_role = true
 }
 
 module "ecr" {
