@@ -159,9 +159,9 @@ module "ecr" {
   repository_type   = "private"
 }
 
-resource "aws_secretsmanager_secret" "fastapi_secrets" {
-  name = "fastapi-app-secrets"
-}
+//resource "aws_secretsmanager_secret" "fastapi_secrets" {
+//  name = "fastapi-app-secrets"
+//}
 
 
 # Build & push Docker image with local-exec
