@@ -35,7 +35,7 @@ module "rds" {
   db_name  = var.rds_db_name
   username = var.RDS_USERNAME
   password = var.RDS_PASSWORD
-  db_subnet_group_name   = module.vpc.default_db_subnet_group_name
+
   vpc_security_group_ids = [module.vpc.default_security_group_id]
   subnet_ids             = module.vpc.private_subnets
   publicly_accessible    = false
