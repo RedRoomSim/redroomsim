@@ -198,15 +198,14 @@ resource "aws_secretsmanager_secret" "fastapi_secrets" {
 resource "null_resource" "docker_build_push" {
   provisioner "local-exec" {
     command = <<EOT
-      export IMAGE_TAG=${var.image_tag}
-      echo Image tag: $IMAGE_TAG
       aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${module.ecr.repository_url}
-      docker build -t fastapi-redroom:$IMAGE_TAG ./fastapi-lambda
-      
-      docker push ${module.ecr.repository_url}:$IMAGE_TAG
+      docker build -t fastapi-redroom:${var.image_tag} ./fastapi-lambda
+
+      docker push ${module.ecr.repository_url}:${var.image_tag}
     EOT
   }
   triggers = {
+    image_tag = var.image_tag
     always_run = timestamp()
   }
   depends_on = [module.ecr]
