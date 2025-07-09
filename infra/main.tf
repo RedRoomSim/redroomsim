@@ -200,7 +200,7 @@ resource "null_resource" "docker_build_push" {
     command = <<EOT
       aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${module.ecr.repository_url}
       docker build -t fastapi-redroom:${var.image_tag} ./fastapi-lambda
-
+      docker tag fastapi-redroom:${var.image_tag} ${module.ecr.repository_url}:${var.image_tag}
       docker push ${module.ecr.repository_url}:${var.image_tag}
     EOT
   }
