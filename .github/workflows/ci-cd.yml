@@ -51,7 +51,7 @@ jobs:
 
       - name: Terraform Apply
         working-directory: ./infra
-        run: terraform apply --auto-approve
+        run: terraform apply -var "image_tag=${{ github.run_number }}" --auto-approve
 
       - name: Terraform Output
         id: tf_output
