@@ -35,7 +35,7 @@ module "rds" {
   db_name  = var.rds_db_name
   username = var.RDS_USERNAME
   password = var.RDS_PASSWORD
-
+  db_subnet_group_name   = module.vpc.default_db_subnet_group_name
   vpc_security_group_ids = [module.vpc.default_security_group_id]
   subnet_ids             = module.vpc.private_subnets
   publicly_accessible    = false
@@ -67,7 +67,9 @@ module "frontend_bucket" {
   version = "4.0.0"
 
   bucket = var.frontend_bucket_name
-  restrict_public_buckets = false
+  
+  block_public_acls = false
+  block_public_policy = false
   acl    = "public-read"
 
   website = {
@@ -139,7 +141,7 @@ module "lambda_docker" {
   timeout       = 30
   memory_size   = 512
 
-  #image_uri    = module.ecr.repository_url
+  image_uri    = module.ecr.repository_url
   package_type = "Image"
   source_path = "fastapi-lambda/app"
   environment_variables = {
@@ -163,6 +165,7 @@ module "ecr" {
   repository_name   = "fastapi-redroom"
   create_repository = true
   repository_type   = "private"
+  create_lifecycle_policy = false
 }
 
 # resource "aws_ecr_lifecycle_policy" "this" {
