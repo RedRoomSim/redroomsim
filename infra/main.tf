@@ -69,7 +69,8 @@ module "frontend_bucket" {
   version = "4.0.0"
 
   bucket = var.frontend_bucket_name
-  
+  restrict_public_buckets = false
+  ignore_public_acls = false
   block_public_acls = false
   block_public_policy = false
   acl    = "public-read"
