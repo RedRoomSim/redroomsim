@@ -138,7 +138,7 @@ module "lambda_docker" {
   description   = "FastAPI deployed as Lambda using Docker"
    create_package = false
 
-  image_uri    = "${module.ecr.repository_url}:latest"
+  image_uri    = "${module.ecr.repository_url}:${timestamp()}"
   package_type = "Image"
   #source_path = "fastapi-lambda/app"
   environment_variables = {
