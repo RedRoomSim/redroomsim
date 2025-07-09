@@ -203,7 +203,7 @@ resource "null_resource" "docker_build_push" {
       docker tag fastapi-redroom:${var.image_tag} ${module.ecr.repository_url}:${var.image_tag}
       docker push ${module.ecr.repository_url}:${var.image_tag}
     EOT
-  }
+  } 
   triggers = {
     image_tag = var.image_tag
     always_run = timestamp()
