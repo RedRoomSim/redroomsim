@@ -39,7 +39,7 @@ module "rds" {
   password = var.RDS_PASSWORD
 
   vpc_security_group_ids = [module.vpc.default_security_group_id]
-  subnet_ids             = module.vpc.private_subnets
+  subnet_ids             = [module.vpc.private_subnets]
   publicly_accessible    = false
   skip_final_snapshot    = true
 }
@@ -156,6 +156,7 @@ module "lambda_docker" {
     }
   ]
   create_role = true
+  depends_on = [null_resource.docker_build_push]
 }
 
 module "ecr" {
