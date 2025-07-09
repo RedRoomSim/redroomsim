@@ -136,14 +136,11 @@ module "lambda_docker" {
 
   function_name = "redroom-fastapi"
   description   = "FastAPI deployed as Lambda using Docker"
-  handler       = "app.main.handler"
-  runtime       = "python3.11"
-  timeout       = 30
-  memory_size   = 512
+   create_package = false
 
   image_uri    = module.ecr.repository_url
   package_type = "Image"
-  source_path = "fastapi-lambda/app"
+  #source_path = "fastapi-lambda/app"
   environment_variables = {
     STAGE = "prod"
   }
