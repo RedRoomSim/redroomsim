@@ -196,7 +196,7 @@ resource "null_resource" "docker_build_push" {
   provisioner "local-exec" {
     command = <<EOT
       aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${module.ecr.repository_url}
-      docker build -t fastapi-redroom ./lambda
+      docker build -t fastapi-redroom ./fastapi-lambda
       docker tag fastapi-redroom:latest ${module.ecr.repository_url}:latest
       docker push ${module.ecr.repository_url}:latest
     EOT
