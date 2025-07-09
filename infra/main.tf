@@ -199,9 +199,10 @@ resource "null_resource" "docker_build_push" {
   provisioner "local-exec" {
     command = <<EOT
       export IMAGE_TAG=${var.image_tag}
+      echo Image tag: $IMAGE_TAG
       aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${module.ecr.repository_url}
-      docker build -t fastapi-redroom ./fastapi-lambda
-      docker tag fastapi-redroom:$IMAGE_TAG ${module.ecr.repository_url}:$IMAGE_TAG
+      docker build -t fastapi-redroom:$IMAGE_TAG ./fastapi-lambda
+      
       docker push ${module.ecr.repository_url}:$IMAGE_TAG
     EOT
   }
@@ -210,7 +211,7 @@ resource "null_resource" "docker_build_push" {
   }
   depends_on = [module.ecr]
 }
-
+#docker tag fastapi-redroom:$IMAGE_TAG ${module.ecr.repository_url}:$IMAGE_TAG
 
 # ------------------------------------------------------------------------------
 # API Gateway v2
