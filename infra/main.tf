@@ -28,7 +28,7 @@ module "rds" {
   identifier = "redroom-db"
 
   engine            = "postgres"
-  engine_version    = "14.6"
+  engine_version    = "17.4"
   instance_class    = "db.t3.micro"
   allocated_storage = 20
   family = "postgres15"
@@ -67,6 +67,7 @@ module "frontend_bucket" {
   version = "4.0.0"
 
   bucket = var.frontend_bucket_name
+  restrict_public_buckets = false
   acl    = "public-read"
 
   website = {
@@ -164,26 +165,26 @@ module "ecr" {
   repository_type   = "private"
 }
 
-resource "aws_ecr_lifecycle_policy" "this" {
-  repository = module.ecr.repository_name
+# resource "aws_ecr_lifecycle_policy" "this" {
+#   repository = module.ecr.repository_name
 
-  policy = jsonencode({
-    rules = [
-      {
-        rulePriority = 1
-        description  = "Retain last 10 images"
-        selection = {
-          tagStatus     = "any"
-          countType     = "imageCountMoreThan"
-          countNumber   = 10
-        }
-        action = {
-          type = "expire"
-        }
-      }
-    ]
-  })
-}
+#   policy = jsonencode({
+#     rules = [
+#       {
+#         rulePriority = 1
+#         description  = "Retain last 10 images"
+#         selection = {
+#           tagStatus     = "any"
+#           countType     = "imageCountMoreThan"
+#           countNumber   = 10
+#         }
+#         action = {
+#           type = "expire"
+#         }
+#       }
+#     ]
+#   })
+# }
 
 resource "aws_secretsmanager_secret" "fastapi_secrets" {
   name = "fastapi-app-secrets-1"
