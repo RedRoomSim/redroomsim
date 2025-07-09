@@ -15,3 +15,4 @@ lambda_timeout        = 30
 frontend_bucket_name  = "redroomsim-frontend-bucket"
 acm_validation_method = "DNS"
 environment           = "development"
+image_tag = "$(date +%s)"

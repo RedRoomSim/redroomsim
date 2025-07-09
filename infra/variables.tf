@@ -104,3 +104,8 @@ variable "tags" {
     Environment = "Development"
   }
 }
+variable "image_tag" {
+  description = "The tag of the Docker image to use for the Lambda function"
+  type        = string
+  default     = "latest"
+}

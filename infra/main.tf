@@ -1,3 +1,5 @@
+
+
 # ------------------------------------------------------------------------------
 # VPC
 # ------------------------------------------------------------------------------
@@ -136,9 +138,9 @@ module "lambda_docker" {
 
   function_name = "redroom-fastapi"
   description   = "FastAPI deployed as Lambda using Docker"
-   create_package = false
+  create_package = false
 
-  image_uri    = "${module.ecr.repository_url}:${timestamp()}"
+  image_uri    = "${module.ecr.repository_url}:${var.image_tag}"
   package_type = "Image"
   #source_path = "fastapi-lambda/app"
   environment_variables = {
@@ -195,10 +197,11 @@ resource "aws_secretsmanager_secret" "fastapi_secrets" {
 resource "null_resource" "docker_build_push" {
   provisioner "local-exec" {
     command = <<EOT
+      export IMAGE_TAG=${var.image_tag}
       aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${module.ecr.repository_url}
       docker build -t fastapi-redroom ./fastapi-lambda
-      docker tag fastapi-redroom:latest ${module.ecr.repository_url}:latest
-      docker push ${module.ecr.repository_url}:latest
+      docker tag fastapi-redroom:$IMAGE_TAG ${module.ecr.repository_url}:$IMAGE_TAG
+      docker push ${module.ecr.repository_url}:$IMAGE_TAG
     EOT
   }
   triggers = {
