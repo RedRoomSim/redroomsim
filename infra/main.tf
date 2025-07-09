@@ -64,7 +64,7 @@ resource "aws_route53_record" "frontend_alias" {
 
 module "frontend_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "3.15.1"
+  version = "4.0.0"
 
   bucket = var.frontend_bucket_name
   acl    = "public-read"
@@ -87,7 +87,7 @@ module "cloudfront" {
 
   origin = {
     frontend = {
-      domain_name = module.frontend_bucket.bucket_regional_domain_name
+      domain_name = module.frontend_bucket.s3_bucket_website_endpoint
       origin_id   = "frontend-origin"
 
       custom_origin_config = {
@@ -157,11 +157,32 @@ module "lambda_docker" {
 
 module "ecr" {
   source  = "terraform-aws-modules/ecr/aws"
-  version = "1.5.0"
+  version = "2.2.0"
 
   repository_name   = "fastapi-redroom"
   create_repository = true
   repository_type   = "private"
+}
+
+resource "aws_ecr_lifecycle_policy" "this" {
+  repository = module.ecr.repository_name
+
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Retain last 10 images"
+        selection = {
+          tagStatus     = "any"
+          countType     = "imageCountMoreThan"
+          countNumber   = 10
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_secretsmanager_secret" "fastapi_secrets" {
@@ -229,23 +250,3 @@ resource "aws_apigatewayv2_stage" "default" {
   auto_deploy = true
 }
 
-resource "aws_ecr_lifecycle_policy" "this" {
-  repository = module.ecr.repository_name
-
-  policy = jsonencode({
-    rules = [
-      {
-        rulePriority = 1
-        description  = "Retain last 10 images"
-        selection = {
-          tagStatus     = "any"
-          countType     = "imageCountMoreThan"
-          countNumber   = 10
-        }
-        action = {
-          type = "expire"
-        }
-      }
-    ]
-  })
-}
