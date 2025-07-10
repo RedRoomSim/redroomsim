@@ -91,7 +91,7 @@ module "frontend_bucket" {
 }
 
 resource "aws_s3_bucket_policy" "frontend_bucket" {
-  bucket = module.frontend_bucket.bucket
+  bucket = var.frontend_bucket_name
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -103,7 +103,7 @@ resource "aws_s3_bucket_policy" "frontend_bucket" {
           Service = "cloudfront.amazonaws.com"
         }
         Action    = "s3:GetObject"
-        Resource  = "${module.frontend_bucket.bucket_arn}/*"
+        Resource  = "${module.frontend_bucket.s3_bucket_arn}/*"
         Condition = {
           StringEquals = {
             "AWS:SourceArn" = module.cloudfront.cloudfront_distribution_arn
