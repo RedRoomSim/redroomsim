@@ -31,7 +31,7 @@ const ScenarioSelectorPage = () => {
   useEffect(() => {
     const fetchScenarios = async () => {
       try {
-        const response = await axios.get("https://redroomsim.com/api/sim/list");
+        const response = await axios.get("https://api.redroomsim.com/sim/list");
         setScenarios(response.data.scenarios || []);
       } catch (err) {
         console.error("Failed to fetch scenarios", err);
