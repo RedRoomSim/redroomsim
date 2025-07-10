@@ -267,11 +267,31 @@ module "apigateway" {
 }
 
 resource "aws_apigatewayv2_domain_name" "custom" {
-  domain_name = "redroomsim.com"
+  domain_name = "api.redroomsim.com"
+
   domain_name_configuration {
-    certificate_arn = var.acm_certificate_arn  # ACM cert for your domain
+    certificate_arn = var.acm_certificate_arn
     endpoint_type   = "REGIONAL"
     security_policy = "TLS_1_2"
+  }
+}
+
+resource "aws_apigatewayv2_api_mapping" "custom_mapping" {
+  api_id      = module.apigateway.apigatewayv2_api_id
+  domain_name = aws_apigatewayv2_domain_name.custom.id
+  stage       = module.apigateway.apigatewayv2_stage_name
+  api_mapping_key = "api"
+}
+
+resource "aws_route53_record" "apigateway_alias" {
+  zone_id = var.hosted_zone_id
+  name    = "api.redroomsim.com"
+  type    = "A"
+
+  alias {
+    name                   = aws_apigatewayv2_domain_name.custom.domain_name_configuration[0].target_domain_name
+    zone_id                = aws_apigatewayv2_domain_name.custom.domain_name_configuration[0].hosted_zone_id
+    evaluate_target_health = false
   }
 }
 
@@ -284,9 +304,9 @@ resource "aws_apigatewayv2_integration" "lambda" {
   timeout_milliseconds   = 30000
 }
 
-resource "aws_apigatewayv2_route" "default" {
+resource "aws_apigatewayv2_route" "api_proxy" {
   api_id    = module.apigateway.apigatewayv2_api_id
-  route_key = "$default"
+  route_key = "ANY /{proxy+}"
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 
@@ -300,7 +320,7 @@ resource "aws_lambda_permission" "allow_apigateway" {
 
 resource "aws_apigatewayv2_stage" "default" {
   api_id      = module.apigateway.apigatewayv2_api_id
-  name        = "default"
+  name        = "production"
   auto_deploy = true
 }
 
