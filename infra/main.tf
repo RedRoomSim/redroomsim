@@ -266,6 +266,15 @@ module "apigateway" {
   domain_name_certificate_arn = var.acm_certificate_arn
 }
 
+resource "aws_apigatewayv2_domain_name" "custom" {
+  domain_name = "redroomsim.com"
+  domain_name_configuration {
+    certificate_arn = var.acm_certificate_arn  # ACM cert for your domain
+    endpoint_type   = "REGIONAL"
+    security_policy = "TLS_1_2"
+  }
+}
+
 resource "aws_apigatewayv2_integration" "lambda" {
   api_id                 = module.apigateway.apigatewayv2_api_id
   integration_type       = "AWS_PROXY"

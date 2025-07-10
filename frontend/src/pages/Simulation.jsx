@@ -40,7 +40,7 @@ const Simulation = () => {
   useEffect(() => {
     const fetchScenario = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/sim/${scenarioId}`);
+        const response = await axios.get(`https://redroomsim.com/api/sim/${scenarioId}`);
         setScenario(response.data);
         setAnalytics((prev) => ({ ...prev, startTime: Date.now() }));
       } catch (error) {

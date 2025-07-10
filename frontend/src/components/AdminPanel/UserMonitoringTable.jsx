@@ -35,7 +35,7 @@ const UserMonitoringTable = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/logs/login-activity");
+        const response = await axios.get("https://redroomsim.com/api/logs/login-activity");
         setLogs(response.data);
         setFilteredLogs(response.data);
       } catch (error) {

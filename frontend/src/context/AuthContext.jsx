@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }) => {
       setRole(userData.role || "pending");
       
       // Log login activity to backend
-      await axios.post("http://localhost:8000/api/logs/log-login", {
+      await axios.post("https://redroomsim.com/api/logs/log-login", {
         uid: userCredential.user.uid,
         email: userCredential.user.email,
         role: userData.role || "pending",
@@ -135,7 +135,7 @@ export const AuthProvider = ({ children }) => {
 
           await updateDoc(ref, updates);
         }
-        await axios.post("http://localhost:8000/api/logs/log-failed-login", {
+        await axios.post("https://redroomsim.com/api/logs/log-failed-login", {
           uid,
           email,
           role,
@@ -150,7 +150,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     if (currentUser) {
-      await axios.post("http://localhost:8000/api/logs/log-logout", {
+      await axios.post("https://redroomsim.com/api/logs/log-logout", {
         uid: currentUser.uid,
         email: currentUser.email,
         role: role || "unknown",
@@ -161,7 +161,7 @@ export const AuthProvider = ({ children }) => {
   
   const logPasswordChange = async () => {
     if (currentUser) {
-      await axios.post("http://localhost:8000/api/logs/log-password-change", {
+      await axios.post("https://redroomsim.com/api/logs/log-password-change", {
         uid: currentUser.uid,
         email: currentUser.email,
         role: role || "unknown",

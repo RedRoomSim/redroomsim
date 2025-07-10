@@ -38,7 +38,7 @@ const UploadEvidence = () => {
     formData.append("file", file);
 
     try {
-      const response = await axios.post("http://localhost:8000/api/sim/upload-scenario", formData, {
+      const response = await axios.post("https://redroomsim.com/api/sim/upload-scenario", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setUploadResult(response.data);
