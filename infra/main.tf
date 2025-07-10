@@ -86,6 +86,19 @@ module "frontend_bucket" {
     index_document = "index.html"
     error_document = "index.html"
   }
+   attach_policy = true
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:GetObject"
+        Resource  = "arn:aws:s3:::${frontend_bucket_name}/*"
+      }
+    ]
+  })
+
 }
 
 # ------------------------------------------------------------------------------
