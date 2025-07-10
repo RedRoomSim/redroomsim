@@ -6,7 +6,7 @@
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.1.0"
+  version = "6.0.1"
 
   name = "redroom-vpc"
   cidr = var.vpc_cidr
@@ -24,9 +24,11 @@ module "vpc" {
 # RDS - PostgreSQL instance
 # ------------------------------------------------------------------------------
 
+
+
 module "rds" {
   source  = "terraform-aws-modules/rds/aws"
-  version = "6.1.0"
+  version = "6.12.0"
 
   identifier = "redroom-db"
 
@@ -34,15 +36,19 @@ module "rds" {
   engine_version    = "17.4"
   instance_class    = "db.t3.micro"
   allocated_storage = 20
-  family = "postgres15"
+  family = "postgres17"
   db_name  = var.rds_db_name
   username = var.RDS_USERNAME
   password = var.RDS_PASSWORD
-  subnet_ids             = ["subnet-0f72ff5733c728657", "subnet-004bd4e425f33996b"]
+  create_db_subnet_group = true
+  db_subnet_group_name = "redroom-db-subnet-group"
+  subnet_ids             = module.vpc.private_subnets
   vpc_security_group_ids = [module.vpc.default_security_group_id]
 
-  publicly_accessible    = false
-  skip_final_snapshot    = true
+  publicly_accessible = false
+  multi_az            = false
+  skip_final_snapshot = true
+  deletion_protection = false
 }
 
 # ------------------------------------------------------------------------------
