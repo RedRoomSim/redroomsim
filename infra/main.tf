@@ -279,7 +279,7 @@ resource "aws_apigatewayv2_domain_name" "custom" {
 resource "aws_apigatewayv2_api_mapping" "custom_mapping" {
   api_id      = module.apigateway.apigatewayv2_api_id
   domain_name = aws_apigatewayv2_domain_name.custom.id
-  stage       = module.apigateway.apigatewayv2_stage_name
+  stage       = aws_apigatewayv2_stage.default.name
   api_mapping_key = "api"
 }
 
