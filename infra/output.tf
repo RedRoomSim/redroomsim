@@ -13,3 +13,11 @@ output "cloudfront_distribution_id" {
 output "cloudfront_app_url" {
   value = module.cloudfront.cloudfront_distribution_domain_name
 }
+
+output "bucket_domain_name" {
+  value = aws_s3_bucket.this[0].bucket_regional_domain_name
+}
+
+output "origin_access_identity_path" {
+  value = aws_cloudfront_origin_access_identity.this.cloudfront_access_identity_path
+}

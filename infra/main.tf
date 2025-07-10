@@ -127,8 +127,9 @@ resource "aws_cloudfront_origin_access_control" "frontend_oac" {
 module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
   version = "3.2.1"
-
+  
   enabled             = true
+  is_ipv6_enabled     = false
   comment             = "Frontend CDN"
   aliases             = [var.domain_name]
   default_root_object = "index.html"
@@ -139,21 +140,8 @@ module "cloudfront" {
       origin_id   = "s3Origin"
 
       s3_origin_config = {
-        origin_access_control_id = aws_cloudfront_origin_access_control.frontend_oac.id
+        origin_access_identity = module.frontend_bucket.origin_access_identity_path
       }
-    }
-  }
-
-  default_cache_behavior = {
-    target_origin_id       = "s3Origin"
-    viewer_protocol_policy = "redirect-to-https"
-
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    compress         = true
-
-    geo_restriction = {
-      restriction_type = "none"
     }
   }
 
