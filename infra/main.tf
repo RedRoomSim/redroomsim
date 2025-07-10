@@ -116,7 +116,7 @@ resource "aws_s3_bucket_policy" "frontend_bucket" {
 # ------------------------------------------------------------------------------
 # CloudFront - uses ACM cert
 # ------------------------------------------------------------------------------
-resource "aws_cloudfront_origin_access_control" "frontend_oac" {
+resource "aws_cloudfront_origin_access_control" "oac" {
   name                              = "frontend-oac"
   description                       = "OAC for frontend bucket"
   origin_access_control_origin_type = "s3"
@@ -126,22 +126,22 @@ resource "aws_cloudfront_origin_access_control" "frontend_oac" {
 
 module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
-  version = "3.2.1"
-  
-  enabled             = true
-  is_ipv6_enabled     = false
-  comment             = "Frontend CDN"
-  aliases             = [var.domain_name]
+  version = "3.2.0"
+
+  aliases = [var.domain_name]
+
   default_root_object = "index.html"
+  enabled             = true
+  comment             = "Frontend CDN"
 
   origin = {
-    s3_origin = {
-      domain_name = module.frontend_bucket.s3_bucket_bucket_regional_domain_name
-      origin_id   = "s3Origin"
+    frontend = {
+      domain_name = module.frontend_bucket.bucket_domain_name
+      origin_id   = "frontend-origin"
 
-      s3_origin_config = {
-        origin_access_identity = module.frontend_bucket.origin_access_identity_path
-      }
+      s3_origin_config = {}  # Leave empty for OAC
+
+      origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
     }
   }
 
@@ -151,6 +151,22 @@ module "cloudfront" {
     minimum_protocol_version = "TLSv1.2_2021"
   }
 
+  default_cache_behavior = {
+    target_origin_id       = "frontend-origin"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
+
+    forwarded_values = {
+      query_string = false
+      cookies = {
+        forward = "none"
+      }
+    }
+  }
+
+  depends_on = [aws_cloudfront_origin_access_control.oac]
 }
 
 # ------------------------------------------------------------------------------

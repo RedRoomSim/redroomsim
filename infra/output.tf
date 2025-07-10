@@ -17,7 +17,3 @@ output "cloudfront_app_url" {
 output "bucket_domain_name" {
   value = module.frontend_bucket.s3_bucket_bucket_regional_domain_name
 }
-
-output "origin_access_identity_path" {
-  value = module.frontend_bucket.origin_access_identity_path
-}
