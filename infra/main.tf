@@ -6,7 +6,7 @@
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "6.0.1"
+  version = "5.1.0"
 
   name = "redroom-vpc"
   cidr = var.vpc_cidr
@@ -28,7 +28,7 @@ module "vpc" {
 
 module "rds" {
   source  = "terraform-aws-modules/rds/aws"
-  version = "6.12.0"
+  version = "6.1.0"
 
   identifier = "redroom-db"
 
