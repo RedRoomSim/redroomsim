@@ -6,13 +6,18 @@ from routes.logging_router import router as logging_router
 
 app = FastAPI()
 
+origins = [
+    "https://redroomsim.com",
+    "https://www.redroomsim.com",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],    #["http://localhost:5173"],  # or "*" for dev only
+    allow_origins=origins,    #["http://localhost:5173"],  # or "*" for dev only
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-app.include_router(sim_router, prefix="/api/sim")
-app.include_router(logging_router, prefix="/api/logs")
+app.include_router(sim_router, prefix="/sim")
+app.include_router(logging_router, prefix="/logs")
