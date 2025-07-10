@@ -136,7 +136,7 @@ module "cloudfront" {
 
   origin = {
     frontend = {
-      domain_name = module.frontend_bucket.bucket_domain_name
+      domain_name = module.frontend_bucket.s3_bucket_bucket_domain_name
       origin_id   = "frontend-origin"
 
       s3_origin_config = {}  # Leave empty for OAC
