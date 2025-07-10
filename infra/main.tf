@@ -73,81 +73,96 @@ resource "aws_route53_record" "frontend_alias" {
 
 module "frontend_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.0.0"
+  version = "3.15.1"
 
   bucket = var.frontend_bucket_name
-  restrict_public_buckets = false
-  ignore_public_acls = false
-  block_public_acls = false
-  block_public_policy = false
-  acl    = "public-read"
 
-  website = {
-    index_document = "index.html"
-    error_document = "index.html"
-  }
-   attach_policy = true
+  acl    = "private"
+
+  control_object_ownership = true
+  object_ownership         = "BucketOwnerPreferred"
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_policy" "frontend_bucket" {
+  bucket = module.frontend_bucket.bucket
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
+        Sid       = "AllowCloudFrontServicePrincipalReadOnly"
         Effect    = "Allow"
-        Principal = "*"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
         Action    = "s3:GetObject"
-        Resource  = "arn:aws:s3:::${frontend_bucket_name}/*"
+        Resource  = "${module.frontend_bucket.bucket_arn}/*"
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = module.cloudfront.cloudfront_distribution_arn
+          }
+        }
       }
     ]
   })
-
 }
-
 # ------------------------------------------------------------------------------
 # CloudFront - uses ACM cert
 # ------------------------------------------------------------------------------
+resource "aws_cloudfront_origin_access_control" "frontend_oac" {
+  name                              = "frontend-oac"
+  description                       = "OAC for frontend bucket"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
 
 module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
   version = "3.2.1"
 
-  aliases = [var.domain_name]
+  enabled             = true
+  comment             = "Frontend CDN"
+  aliases             = [var.domain_name]
+  default_root_object = "index.html"
 
   origin = {
-    frontend = {
-      domain_name = module.frontend_bucket.s3_bucket_website_endpoint
-      origin_id   = "frontend-origin"
+    s3_origin = {
+      domain_name = module.frontend_bucket.s3_bucket_bucket_regional_domain_name
+      origin_id   = "s3Origin"
 
-      custom_origin_config = {
-        http_port              = 80
-        https_port             = 443
-        origin_protocol_policy = "http-only"
-        origin_ssl_protocols   = ["TLSv1.2"]
+      s3_origin_config = {
+        origin_access_control_id = aws_cloudfront_origin_access_control.frontend_oac.id
       }
     }
   }
 
   default_cache_behavior = {
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "frontend-origin"
-
+    target_origin_id       = "s3Origin"
     viewer_protocol_policy = "redirect-to-https"
 
-    forwarded_values = {
-      query_string = false
-      cookies = {
-        forward = "none"
-      }
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    compress         = true
+
+    geo_restriction = {
+      restriction_type = "none"
     }
   }
 
   viewer_certificate = {
-    acm_certificate_arn = var.acm_certificate_arn
-    ssl_support_method  = "sni-only"
+    acm_certificate_arn      = var.acm_certificate_arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 
-  default_root_object = "index.html"
-  enabled             = true
-  price_class         = "PriceClass_All"
 }
 
 # ------------------------------------------------------------------------------
