@@ -278,8 +278,8 @@ module "apigateway" {
 
   name          = "redroom-api"
   protocol_type = "HTTP"
-  # domain_name   = "api.${var.domain_name}"
-  # domain_name_certificate_arn = var.acm_certificate_arn
+  domain_name   = "api.${var.domain_name}"
+  domain_name_certificate_arn = var.acm_certificate_arn
 }
 
 resource "aws_apigatewayv2_domain_name" "custom" {
