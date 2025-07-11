@@ -261,7 +261,7 @@ module "apigateway" {
   version = "2.1.0"
 
   name          = "redroom-api"
-  protocol_type = "HTTP"
+  protocol_type = "HTTPS"
   domain_name   = var.domain_name
   domain_name_certificate_arn = var.acm_certificate_arn
 }
@@ -337,6 +337,6 @@ resource "aws_apigatewayv2_stage" "default" {
   }
 }
 resource "aws_cloudwatch_log_group" "api_gw" {
-  name              = "/aws/apigateway/${module.apigateway.apigatewayv2_api_name}"
+  name              = "/aws/apigateway/redroom-api"
   retention_in_days = 7
 }
