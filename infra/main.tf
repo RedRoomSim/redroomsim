@@ -389,7 +389,7 @@ module "ec2_sg" {
       from_port   = 5432
       to_port     = 5432
       protocol    = "tcp"
-      cidr_blocks = [module.vpc.database_subnets_cidr_blocks[0]]
+      cidr_blocks = var.vpc_cidr
     }
   ]
 }
