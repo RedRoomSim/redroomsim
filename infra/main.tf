@@ -207,7 +207,7 @@ module "lambda_docker" {
   policy_statements = [
     {
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = "arn:aws:secretsmanager:us-east-1:216989113260:secret:rds!db-16eac987-ba6d-4655-9ae6-89bdfaa972ae-q9tHBZ"
+      resources = ["arn:aws:secretsmanager:us-east-1:216989113260:secret:rds!db-16eac987-ba6d-4655-9ae6-89bdfaa972ae-q9tHBZ"]
     }
   ]
   create_role = true
