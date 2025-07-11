@@ -320,7 +320,19 @@ resource "aws_lambda_permission" "allow_apigateway" {
 
 resource "aws_apigatewayv2_stage" "default" {
   api_id      = module.apigateway.apigatewayv2_api_id
-  name        = "production"
+  name        = "$default"
   auto_deploy = true
-}
 
+  default_route_settings {
+  throttling_burst_limit = 5000
+  throttling_rate_limit  = 10000
+  }
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_gw.arn
+    format = jsonencode({
+      requestId = "$context.requestId"
+      sourceIp  = "$context.identity.sourceIp"
+    })
+  }
+}

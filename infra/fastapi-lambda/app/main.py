@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes.sim_router import sim_router as sim_router
+from routes.sim_router import sim_router
 from routes.logging_router import router as logging_router
 from mangum import Mangum
 
@@ -13,7 +13,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,    #["http://localhost:5173"],  # or "*" for dev only
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -21,6 +21,5 @@ app.add_middleware(
 
 app.include_router(sim_router, prefix="/sim")
 app.include_router(logging_router, prefix="/logs")
-
 
 handler = Mangum(app)
