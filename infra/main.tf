@@ -43,14 +43,30 @@ module "rds" {
   create_db_subnet_group = true
   db_subnet_group_name = "redroom-db-subnet-group"
   subnet_ids             = module.vpc.private_subnets
-  vpc_security_group_ids = [module.vpc.default_security_group_id]
+  vpc_security_group_ids = [module.rds_sg.security_group_id]
 
   publicly_accessible = false
   multi_az            = false
   skip_final_snapshot = true
   deletion_protection = false
 }
+module "rds_sg" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.1.0"
 
+  name        = "rds-sg"
+  description = "Allow PostgreSQL from EC2"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress_with_source_security_group_id = [
+    {
+      from_port                = 5432
+      to_port                  = 5432
+      protocol                 = "tcp"
+      source_security_group_id = module.ec2_sg.security_group_id
+    }
+  ]
+}
 # ------------------------------------------------------------------------------
 # Route53 
 # ------------------------------------------------------------------------------
@@ -339,4 +355,41 @@ resource "aws_apigatewayv2_stage" "default" {
 resource "aws_cloudwatch_log_group" "api_gw" {
   name              = "/aws/apigateway/redroom-api"
   retention_in_days = 7
+}
+# ------------------------------------------------------------------------------
+# Bastion Host EC2 Instance
+# ------------------------------------------------------------------------------
+module "ec2_instance" {
+  source  = "terraform-aws-modules/ec2-instance/aws"
+  version = "5.5.0"
+
+  name = "Bastion"
+
+  instance_type          = var.ec2_instance_type
+  ami                    = var.ami_id
+  subnet_id              = module.vpc.public_subnets[0]
+  vpc_security_group_ids = [module.ec2_sg.security_group_id]
+  key_name               = var.ec2_key_name
+  iam_instance_profile   = var.ec2_instance_profile
+
+  tags = {
+    Name = "Bastion"
+  }
+}
+module "ec2_sg" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.1.0"
+
+  name        = "ec2-sg"
+  description = "Allow EC2 to connect to RDS"
+  vpc_id      = module.vpc.vpc_id
+
+  egress_with_cidr_blocks = [
+    {
+      from_port   = 5432
+      to_port     = 5432
+      protocol    = "tcp"
+      cidr_blocks = [module.vpc.database_subnets_cidr_blocks[0]]
+    }
+  ]
 }

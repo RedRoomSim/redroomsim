@@ -15,3 +15,7 @@ lambda_timeout        = 30
 frontend_bucket_name  = "redroomsim-frontend-bucket"
 acm_validation_method = "DNS"
 environment           = "development"
+ec2_instance_type     = "t3.micro"
+ec2_key_name          = "bastion"
+ami_id                = "ami-05ffe3c48a9991133"
+ec2_instance_profile  = "Bastion-role"

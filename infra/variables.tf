@@ -109,3 +109,20 @@ variable "image_tag" {
   type        = string
   default     = "latest"
 }
+variable "ec2_instance_profile" {
+  description = "IAM instance profile name to attach to EC2"
+  type        = string
+}
+variable "ec2_instance_type" {
+  description = "EC2 instance type for the application server"
+  type        = string
+  default     = "t3.micro"
+}
+variable "ec2_key_name" {
+  description = "Name of the EC2 key pair for SSH access"
+  type        = string
+}
+variable "ami_id" {
+  description = "AMI ID for the EC2 instance"
+  type        = string
+}
