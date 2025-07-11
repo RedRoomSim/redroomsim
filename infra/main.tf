@@ -207,7 +207,7 @@ module "lambda_docker" {
   policy_statements = [
     {
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = [aws_secretsmanager_secret.fastapi_secrets.arn]
+      resources = "arn:aws:secretsmanager:us-east-1:216989113260:secret:rds!db-16eac987-ba6d-4655-9ae6-89bdfaa972ae-q9tHBZ"
     }
   ]
   create_role = true
@@ -295,7 +295,7 @@ resource "aws_apigatewayv2_domain_name" "custom" {
 resource "aws_apigatewayv2_api_mapping" "custom_mapping" {
   api_id      = module.apigateway.apigatewayv2_api_id
   domain_name = aws_apigatewayv2_domain_name.custom.id
-  stage       = aws_apigatewayv2_stage.default.name
+  stage       = "$default"
   api_mapping_key = "api"
 }
 
