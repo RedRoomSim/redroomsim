@@ -278,6 +278,7 @@ module "apigateway" {
 
   name          = "redroom-api"
   protocol_type = "HTTP"
+  create_api_domain_name = false
   domain_name   = "api.${var.domain_name}"
   domain_name_certificate_arn = var.acm_certificate_arn
 }
