@@ -261,7 +261,7 @@ module "apigateway" {
   version = "2.1.0"
 
   name          = "redroom-api"
-  protocol_type = "HTTPS"
+  protocol_type = "HTTP"
   domain_name   = var.domain_name
   domain_name_certificate_arn = var.acm_certificate_arn
 }
