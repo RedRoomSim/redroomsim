@@ -281,6 +281,14 @@ module "apigateway" {
   create_api_domain_name = false
   domain_name   = "api.${var.domain_name}"
   domain_name_certificate_arn = var.acm_certificate_arn
+  cors_configuration = {
+    allow_origins = ["https://redroomsim.com"]
+    allow_methods = ["GET", "POST", "OPTIONS"]
+    allow_headers = ["Content-Type", "Authorization"]
+    expose_headers = []
+    max_age = 3600
+  }
+  
 }
 
 resource "aws_apigatewayv2_domain_name" "custom" {
