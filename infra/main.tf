@@ -339,4 +339,4 @@ resource "aws_apigatewayv2_stage" "default" {
 resource "aws_cloudwatch_log_group" "api_gw" {
   name              = "/aws/apigateway/redroom-api"
   retention_in_days = 7
-} 
+}
