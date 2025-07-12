@@ -5,7 +5,7 @@ WORKDIR /var/task
 
 # Copy code
 COPY app ./app
-COPY bootstrap.sh ./
+#COPY bootstrap.sh ./
 COPY requirements.txt ./
 
 # Install dependencies
