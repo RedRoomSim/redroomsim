@@ -212,19 +212,30 @@ module "cloudfront" {
 # ------------------------------------------------------------------------------
 # Lambda Function
 # ------------------------------------------------------------------------------
-module "lambda_docker" {
+
+# resource "aws_secretsmanager_secret" "fastapi_secrets" {
+#   name = "fastapi-app-secrets-1"
+# }
+
+module "fastapi_lambda" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "5.2.0"
 
   function_name = "redroom-fastapi"
-  description   = "FastAPI deployed as Lambda using Docker"
-  create_package = false
+  description   = "FastAPI deployed as Lambda"
 
-  image_uri    = "${module.ecr.repository_url}:${var.image_tag}"
-  package_type = "Image"
-  #source_path = "fastapi-lambda/app"
+  runtime      = "python3.11"
+  handler      = "main.handler"
+  source_path  = [
+    "fastapi-lambda/app",
+    "fastapi-lambda/requirements.txt"
+  ]
+
   vpc_subnet_ids         = module.vpc.private_subnets
   vpc_security_group_ids = [module.lambda_sg.security_group_id]
+  memory_size            = var.lambda_memory_size
+  timeout                = var.lambda_timeout
+
   environment_variables = {
     STAGE = "prod"
     DATABASE_URL = format(
@@ -244,63 +255,10 @@ module "lambda_docker" {
       resources = ["arn:aws:secretsmanager:us-east-1:216989113260:secret:rds!db-16eac987-ba6d-4655-9ae6-89bdfaa972ae-q9tHBZ"]
     }
   ]
+
   create_role = true
-  depends_on = [null_resource.docker_build_push]
 }
 
-module "ecr" {
-  source  = "terraform-aws-modules/ecr/aws"
-  version = "2.2.0"
-
-  repository_name   = "fastapi-redroom"
-  create_repository = true
-  repository_type   = "private"
-  create_lifecycle_policy = false
-}
-
-# resource "aws_ecr_lifecycle_policy" "this" {
-#   repository = module.ecr.repository_name
-
-#   policy = jsonencode({
-#     rules = [
-#       {
-#         rulePriority = 1
-#         description  = "Retain last 10 images"
-#         selection = {
-#           tagStatus     = "any"
-#           countType     = "imageCountMoreThan"
-#           countNumber   = 10
-#         }
-#         action = {
-#           type = "expire"
-#         }
-#       }
-#     ]
-#   })
-# }
-
-# resource "aws_secretsmanager_secret" "fastapi_secrets" {
-#   name = "fastapi-app-secrets-1"
-# }
-
-
-# Build & push Docker image with local-exec
-resource "null_resource" "docker_build_push" {
-  provisioner "local-exec" {
-    command = <<EOT
-      aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${module.ecr.repository_url}
-      docker build -t fastapi-redroom:${var.image_tag} ./fastapi-lambda
-      docker tag fastapi-redroom:${var.image_tag} ${module.ecr.repository_url}:${var.image_tag}
-      docker push ${module.ecr.repository_url}:${var.image_tag}
-    EOT
-  } 
-  triggers = {
-    image_tag = var.image_tag
-    always_run = timestamp()
-  }
-  depends_on = [module.ecr]
-}
-#docker tag fastapi-redroom:$IMAGE_TAG ${module.ecr.repository_url}:$IMAGE_TAG
 
 # ------------------------------------------------------------------------------
 # API Gateway v2
@@ -360,7 +318,7 @@ resource "aws_route53_record" "apigateway_alias" {
 resource "aws_apigatewayv2_integration" "lambda" {
   api_id                 = module.apigateway.apigatewayv2_api_id
   integration_type       = "AWS_PROXY"
-  integration_uri        = module.lambda_docker.lambda_function_invoke_arn
+  integration_uri        = module.fastapi_lambda.lambda_function_invoke_arn
   integration_method     = "POST"
   payload_format_version = "2.0"
   timeout_milliseconds   = 30000
@@ -375,7 +333,7 @@ resource "aws_apigatewayv2_route" "api_proxy" {
 resource "aws_lambda_permission" "allow_apigateway" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = module.lambda_docker.lambda_function_name
+  function_name = module.fastapi_lambda.lambda_function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${module.apigateway.apigatewayv2_api_execution_arn}/*/*"
 }
