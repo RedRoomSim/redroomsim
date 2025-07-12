@@ -181,3 +181,4 @@ infra/builds/
 # Terraform state files
 *.tfstate
 *.tfstate.backup
+*.zip

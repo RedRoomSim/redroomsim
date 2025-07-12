@@ -288,7 +288,7 @@ module "apigateway" {
     expose_headers = []
     max_age = 3600
   }
-  
+
 }
 
 resource "aws_apigatewayv2_domain_name" "custom" {
@@ -392,6 +392,14 @@ module "ec2_sg" {
   name        = "ec2-sg"
   description = "Allow EC2 to connect to RDS"
   vpc_id      = module.vpc.vpc_id
+  ingress_cidr_blocks = [
+    {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = var.vpc_cidr
+    }
+  ]
 
   egress_with_cidr_blocks = [
     {
