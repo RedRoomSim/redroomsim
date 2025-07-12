@@ -399,6 +399,18 @@ module "ec2_sg" {
       protocol    = "tcp"
       cidr_blocks = "10.0.0.0/16"
     }
+    {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = "0.0.0.0/0"
+    }
+    {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = var.vpc_cidr
+    }
   ]
 
   egress_with_cidr_blocks = [
