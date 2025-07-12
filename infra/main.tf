@@ -64,6 +64,30 @@ module "rds_sg" {
       to_port                  = 5432
       protocol                 = "tcp"
       source_security_group_id = module.ec2_sg.security_group_id
+    },
+    {
+      from_port                = 5432
+      to_port                  = 5432
+      protocol                 = "tcp"
+      source_security_group_id = module.lambda_sg.security_group_id
+    }
+  ]
+}
+
+module "lambda_sg" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.1.0"
+
+  name        = "lambda-sg"
+  description = "Security group for Lambda function"
+  vpc_id      = module.vpc.vpc_id
+
+  egress_with_cidr_blocks = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = "0.0.0.0/0"
     }
   ]
 }
@@ -199,8 +223,18 @@ module "lambda_docker" {
   image_uri    = "${module.ecr.repository_url}:${var.image_tag}"
   package_type = "Image"
   #source_path = "fastapi-lambda/app"
+  vpc_subnet_ids         = module.vpc.private_subnets
+  vpc_security_group_ids = [module.lambda_sg.security_group_id]
   environment_variables = {
     STAGE = "prod"
+    DATABASE_URL = format(
+      "postgresql://%s:%s@%s:%s/%s",
+      var.RDS_USERNAME,
+      var.RDS_PASSWORD,
+      module.rds.db_instance_endpoint,
+      module.rds.db_instance_port,
+      var.rds_db_name
+    )
   }
 
   attach_policy_statements = true
@@ -380,6 +414,16 @@ module "ec2_instance" {
   vpc_security_group_ids = [module.ec2_sg.security_group_id]
   key_name               = var.ec2_key_name
   iam_instance_profile   = var.ec2_instance_profile
+
+  user_data = <<-EOF
+    #!/bin/bash
+    if command -v apt-get >/dev/null 2>&1; then
+      apt-get update -y
+      apt-get install -y postgresql-client-15
+    elif command -v yum >/dev/null 2>&1; then
+      yum install -y postgresql15
+    fi
+  EOF
 
   tags = {
     Name = "Bastion"
