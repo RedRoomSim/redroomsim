@@ -228,7 +228,7 @@ module "fastapi_lambda" {
   handler      = "main.handler"
   source_path  = [
     "fastapi-lambda/app",
-    "fastapi-lambda/requirements.txt"
+    "fastapi-lambda/app/requirements.txt"
   ]
 
   vpc_subnet_ids         = module.vpc.private_subnets
