@@ -316,7 +316,10 @@ module "apigateway" {
   domain_name   = "api.${var.domain_name}"
   domain_name_certificate_arn = var.acm_certificate_arn
   cors_configuration = {
-    allow_origins = ["https://redroomsim.com"]
+    allow_origins = [
+      "https://redroomsim.com",
+      "https://www.redroomsim.com"
+    ]
     allow_methods = ["GET", "POST", "OPTIONS"]
     allow_headers = ["Content-Type", "Authorization"]
     expose_headers = []
