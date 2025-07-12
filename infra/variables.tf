@@ -104,11 +104,6 @@ variable "tags" {
     Environment = "Development"
   }
 }
-variable "image_tag" {
-  description = "The tag of the Docker image to use for the Lambda function"
-  type        = string
-  default     = "latest"
-}
 variable "ec2_instance_profile" {
   description = "IAM instance profile name to attach to EC2"
   type        = string
