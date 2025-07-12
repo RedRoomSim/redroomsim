@@ -305,7 +305,7 @@ resource "aws_apigatewayv2_api_mapping" "custom_mapping" {
   api_id      = module.apigateway.apigatewayv2_api_id
   domain_name = aws_apigatewayv2_domain_name.custom.id
   stage       = "$default"
-  api_mapping_key = "api"
+  api_mapping_key = ""
 }
 
 resource "aws_route53_record" "apigateway_alias" {
