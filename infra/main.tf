@@ -392,7 +392,7 @@ module "ec2_sg" {
   name        = "ec2-sg"
   description = "Allow EC2 to connect to RDS"
   vpc_id      = module.vpc.vpc_id
-  ingress_cidr_blocks = [
+  ingress_with_cidr_blocks = [
     {
       from_port   = 22
       to_port     = 22
