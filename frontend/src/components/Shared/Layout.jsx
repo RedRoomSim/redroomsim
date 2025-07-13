@@ -18,7 +18,7 @@ Changelog:
 */
 
 // Import necessary libraries and components
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 
@@ -26,15 +26,33 @@ import Topbar from "./Topbar";
 * Layout component wraps the main content with Sidebar and Topbar.  It manages the sidebar state and applies appropriate styles for responsiveness.
 **/
 const Layout = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 640);
+
+  // Close sidebar on small screens and handle resize events
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setSidebarOpen(false);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
       <div className="flex h-full">
         <Sidebar isOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-40 z-30 sm:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
 
-        <div className={`flex flex-col flex-1 ${sidebarOpen ? 'ml-64' : 'ml-20'} transition-all duration-300`}>
-          <Topbar sidebarOpen={sidebarOpen} />
+        <div className={`flex flex-col flex-1 ml-0 transition-all duration-300 ${sidebarOpen ? 'sm:ml-64' : 'sm:ml-20'}`}>
+          <Topbar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
           <div className="flex-1 overflow-auto bg-white dark:bg-gray-900 p-6">
             {children}
           </div>
