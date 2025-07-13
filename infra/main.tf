@@ -224,7 +224,7 @@ module "fastapi_lambda" {
   function_name = "redroom-fastapi"
   description   = "FastAPI deployed as Lambda"
 
-  runtime      = "python3.11"
+  runtime      = "python3.13"
   handler      = "main.handler"
   source_path  = [
     "fastapi-lambda/app/aws_api_artifacts.zip"
