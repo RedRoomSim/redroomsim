@@ -35,13 +35,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       
-      - name: Install zip
-        run: sudo apt-get install -y zip
-
-      - name: Zip FastAPI app
-        run: |
-          cd infra/fastapi-lambda/app
-          zip -r aws_api_artifacts.zip .
 
       # ----------------------
       # Terraform Deployment

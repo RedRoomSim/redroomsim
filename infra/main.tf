@@ -221,7 +221,7 @@ module "fastapi_lambda" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "5.2.0"
 
-  function_name = "redroom-fastapi"
+  function_name = "redroom-fastapi-lambda"
   description   = "FastAPI deployed as Lambda"
 
   runtime      = "python3.13"
