@@ -238,11 +238,10 @@ module "fastapi_lambda" {
   environment_variables = {
     STAGE = "prod"
     DATABASE_URL = format(
-      "postgresql://%s:%s@%s:%s/%s",
+      "postgresql://%s:%s@%s/%s",
       var.RDS_USERNAME,
       var.RDS_PASSWORD,
       module.rds.db_instance_endpoint,
-      module.rds.db_instance_port,
       var.rds_db_name
     )
   }
