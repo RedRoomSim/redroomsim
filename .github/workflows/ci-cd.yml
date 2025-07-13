@@ -41,7 +41,7 @@ jobs:
       - name: Zip FastAPI app
         run: |
           cd infra/fastapi-lambda/app
-          zip -r aws_api_artifacts.zip . -x "*.git*" "*.venv*" "__pycache__/*" "*.pyc" "*.pyo"
+          zip -r aws_api_artifacts.zip .
 
       # ----------------------
       # Terraform Deployment
