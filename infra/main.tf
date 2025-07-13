@@ -259,6 +259,10 @@ module "fastapi_lambda" {
   create_role = true
 }
 
+resource "aws_iam_role_policy_attachment" "fastapi_vpc" {
+  role       = module.fastapi_lambda.lambda_role_name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
 
 # ------------------------------------------------------------------------------
 # API Gateway v2
