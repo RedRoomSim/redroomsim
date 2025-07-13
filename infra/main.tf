@@ -227,7 +227,7 @@ module "fastapi_lambda" {
   runtime      = "python3.13"
   handler      = "main.handler"
   source_path  = [
-    "fastapi-lambda/app/aws_api_artifacts.zip"
+    "fastapi-lambda/app"
   ]
 
   vpc_subnet_ids         = module.vpc.private_subnets
