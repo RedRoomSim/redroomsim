@@ -39,7 +39,7 @@ jobs:
         run: sudo apt-get install -y zip
 
       - name: Zip FastAPI app
-        working-directory: ./fastapi/app
+        working-directory: ./infra/fastapi/app
         run: |
           zip -r aws_api_artifacts.zip . -x "*.git*" "*.venv*" "__pycache__/*" "*.pyc" "*.pyo"
 
