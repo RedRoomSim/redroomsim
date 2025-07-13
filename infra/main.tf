@@ -420,4 +420,4 @@ module "ec2_sg" {
       cidr_blocks = var.vpc_cidr
     }
   ]
-}
+} 
