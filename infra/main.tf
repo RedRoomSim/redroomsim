@@ -373,19 +373,15 @@ module "ec2_instance" {
 
   instance_type          = var.ec2_instance_type
   ami                    = var.ami_id
-  subnet_id              = module.vpc.public_subnets[0]
+  subnet_id              = module.vpc.private_subnets[0]
   vpc_security_group_ids = [module.ec2_sg.security_group_id]
   key_name               = var.ec2_key_name
   iam_instance_profile   = var.ec2_instance_profile
 
   user_data = <<-EOF
     #!/bin/bash
-    if command -v apt-get >/dev/null 2>&1; then
-      apt-get update -y
-      apt-get install -y postgresql-client-15
-    elif command -v yum >/dev/null 2>&1; then
-      yum install -y postgresql15
-    fi
+    apt-get update -y
+    apt-get install -y postgresql-client
   EOF
 
   tags = {
@@ -416,10 +412,10 @@ module "ec2_sg" {
 
   egress_with_cidr_blocks = [
     {
-      from_port   = 5432
-      to_port     = 5432
-      protocol    = "tcp"
-      cidr_blocks = var.vpc_cidr
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = "0.0.0.0/0"
     }
   ]
 } 
