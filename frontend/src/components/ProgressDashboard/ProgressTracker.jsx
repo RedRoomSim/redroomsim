@@ -47,10 +47,11 @@ const ProgressTracker = () => {
   const [data] = useState(mockData);
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Progress Dashboard</h2>
 
-      <table className="min-w-full bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden text-gray-900 dark:text-white">
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden text-gray-900 dark:text-white">
         <thead className="bg-[#111827] text-white">
           <tr>
             <th className="py-3 px-6 text-left">Scenario</th>
@@ -71,7 +72,8 @@ const ProgressTracker = () => {
             </tr>
           ))}
         </tbody>
-      </table>
+        </table>
+      </div>
     </div>
   );
 };

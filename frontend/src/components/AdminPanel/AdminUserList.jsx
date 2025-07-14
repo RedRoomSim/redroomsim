@@ -105,7 +105,8 @@ const AdminUserList = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
-        <table className="min-w-full bg-white dark:bg-gray-800 rounded shadow overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white dark:bg-gray-800 rounded shadow overflow-hidden">
           <thead className="bg-gray-200 dark:bg-gray-700 text-left">
             <tr>
               <th className="px-4 py-2">Name</th>
@@ -130,7 +131,8 @@ const AdminUserList = () => {
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
 
       {/* Edit Modal */}
