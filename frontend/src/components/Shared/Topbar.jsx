@@ -23,7 +23,7 @@ import userAvatar from "../../assets/user.png";
 import logo from "../../assets/logo.png";
 import logoutImage from "../../assets/logout.png";
 
-const Topbar = ({ sidebarOpen }) => {
+const Topbar = ({ sidebarOpen, toggleSidebar }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [showToast, setShowToast] = useState(false);
@@ -81,6 +81,11 @@ const Topbar = ({ sidebarOpen }) => {
       {/* Topbar */}
       <div className="flex items-center justify-between bg-white dark:bg-[#1f2937] text-gray-900 dark:text-white h-16 px-4 shadow-md transition-colors">
         <div className="flex items-center space-x-2">
+          <button onClick={toggleSidebar} className="sm:hidden mr-2 focus:outline-none" aria-label="Toggle menu">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
           <Link to="/dashboard" title="Go to Dashboard">
             <img src={logo} alt="Logo" className="h-10 w-10 transition-transform hover:scale-105" />
           </Link>

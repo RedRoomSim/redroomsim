@@ -30,9 +30,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <div
-      className={`fixed top-0 left-0 h-full z-40 shadow-lg transition-all duration-300
-        ${isOpen ? "w-64" : "w-20"}
-        bg-white dark:bg-[#1f2937] text-gray-900 dark:text-white`}
+      className={`fixed top-0 left-0 h-full z-40 shadow-lg transform transition-all duration-300
+        bg-white dark:bg-[#1f2937] text-gray-900 dark:text-white
+        ${isOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64 sm:translate-x-0 sm:w-20'}`}
     >
       {/* Hamburger icon aligned left */}
       <div className="flex items-center justify-start mt-4 px-4">
