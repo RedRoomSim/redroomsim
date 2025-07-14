@@ -69,7 +69,7 @@ const Admin = () => {
   };
 
   return (
-    <div className="p-6 text-gray-900 dark:text-white bg-white dark:bg-gray-900 min-h-screen">
+    <div className="p-6 text-gray-900 dark:text-white bg-white dark:bg-gray-900 min-h-screen overflow-x-auto">
       <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
 
       {hasPendingUsers && (
