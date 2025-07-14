@@ -1,11 +1,11 @@
-CREATE TABLE user_login_logs (
+CREATE TABLE redroomsimdb.user_login_logs (
     id SERIAL PRIMARY KEY,
     uid VARCHAR(255) NOT NULL,
     email VARCHAR(255),
     role VARCHAR(100),
     event VARCHAR(255),
     timestamp TIMESTAMPTZ DEFAULT NOW(),
-    ip_address VARCHAR(45)  -- for future
+    ip_address VARCHAR(45)
 );
 
  CREATE TABLE redroomsimdb.simulation_analytics (

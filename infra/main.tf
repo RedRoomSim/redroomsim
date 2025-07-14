@@ -206,6 +206,18 @@ module "cloudfront" {
     }
   }
 
+  custom_error_response = [
+    {
+      error_code         = 403
+      response_code      = 200
+      response_page_path = "/index.html"
+    },
+    {
+      error_code         = 404
+      response_code      = 200
+      response_page_path = "/index.html"
+    }
+  ]
   depends_on = [aws_cloudfront_origin_access_control.oac]
 }
 
