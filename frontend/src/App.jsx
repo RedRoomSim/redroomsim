@@ -29,6 +29,10 @@ import Layout from "./components/Shared/Layout";
 import Admin from "./pages/Admin";
 import AdminPendingUsers from "./components/AdminPanel/AdminPendingUsers";
 import AdminUserList from "./components/AdminPanel/AdminUserList";
+import AdminMonitoringPage from "./pages/AdminMonitoringPage";
+import AdminAuditLogPage from "./pages/AdminAuditLogPage";
+import AdminScenarioConfigPage from "./pages/AdminScenarioConfigPage";
+import AdminDifficultyPage from "./pages/AdminDifficultyPage";
 import Dashboard from "./pages/Dashboard";
 import ScenarioSelectorPage from "./pages/ScenarioSelectorPage";
 import Simulation from "./pages/Simulation";
@@ -56,7 +60,11 @@ const App = () => {
             <Route path="/redirect" element={<SecureRoute><RoleBasedRedirect /></SecureRoute>} />
             <Route path="/admin" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><Admin /></Layout></RoleProtectedRoute></SecureRoute>} />
             <Route path="/admin/pending-users" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminPendingUsers /></Layout></RoleProtectedRoute></SecureRoute>} />
-            <Route path="/admin/users" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminUserList /></Layout></RoleProtectedRoute></SecureRoute>}/>
+            <Route path="/admin/users" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminUserList /></Layout></RoleProtectedRoute></SecureRoute>} />
+            <Route path="/admin/monitoring" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminMonitoringPage /></Layout></RoleProtectedRoute></SecureRoute>} />
+            <Route path="/admin/audit-log" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminAuditLogPage /></Layout></RoleProtectedRoute></SecureRoute>} />
+            <Route path="/admin/scenario-config" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminScenarioConfigPage /></Layout></RoleProtectedRoute></SecureRoute>} />
+            <Route path="/admin/difficulty" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminDifficultyPage /></Layout></RoleProtectedRoute></SecureRoute>} />
             <Route path="/dashboard" element={<SecureRoute><Layout><Dashboard /></Layout></SecureRoute>} />
             <Route path="/scenarios" element={<SecureRoute><Layout><ScenarioSelectorPage /></Layout></SecureRoute>} />
             <Route path="/upload" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><Upload /></Layout></RoleProtectedRoute></SecureRoute>}/>
