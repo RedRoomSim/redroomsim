@@ -84,7 +84,7 @@ const Admin = () => {
         </div>
       )}
 
-      <div className="flex space-x-4 border-b border-gray-300 dark:border-gray-600 mb-6">
+      <div className="flex overflow-x-auto whitespace-nowrap space-x-4 border-b border-gray-300 dark:border-gray-600 mb-6 py-1">
         {TABS.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
