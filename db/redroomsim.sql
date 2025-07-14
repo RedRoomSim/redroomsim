@@ -18,3 +18,14 @@ CREATE TABLE redroomsimdb.user_login_logs (
      ended_at TIMESTAMP,
      created_at TIMESTAMP DEFAULT now()
 );
+
+CREATE TABLE redroomsimdb.simulation_progress (
+    id SERIAL PRIMARY KEY,
+    sim_uuid UUID NOT NULL UNIQUE,
+    scenario_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    username TEXT NOT NULL,
+    score INTEGER,
+    completed BOOLEAN,
+    created_at TIMESTAMP DEFAULT now()
+);

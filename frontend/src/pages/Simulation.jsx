@@ -22,6 +22,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import ScoringBar from "../components/SimulationEngine/ScoringBar";
 import TimelineViewer from "../components/SimulationEngine/TimelineViewer";
+import { useAuth } from "../context/AuthContext";
 
 const Simulation = () => {
   const { scenarioId } = useParams();
@@ -36,6 +37,8 @@ const Simulation = () => {
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [lastStepTimestamp, setLastStepTimestamp] = useState(null);
+  const [simulationId, setSimulationId] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchScenario = async () => {
@@ -101,6 +104,28 @@ const Simulation = () => {
     }
   };
 
+  useEffect(() => {
+    const saveProgress = async () => {
+      if (!completed || !user || !scenario) return;
+      try {
+        const response = await axios.post("https://api.redroomsim.com/progress/save", {
+          scenario_id: scenarioId,
+          name: scenario.name,
+          username: user.email,
+          score: score,
+          completed: true,
+        });
+        const simId = response.data.simulation_id;
+        setSimulationId(simId);
+        const existing = JSON.parse(localStorage.getItem("simulationIds") || "[]");
+        localStorage.setItem("simulationIds", JSON.stringify([...existing, simId]));
+      } catch (err) {
+        console.error("Failed to save progress", err);
+      }
+    };
+    saveProgress();
+  }, [completed, user, scenario, scenarioId, score]);
+
   if (!scenario) return <div className="p-6">Loading scenario...</div>;
 
   const step = scenario.steps[currentStepIndex];
@@ -125,6 +150,12 @@ const Simulation = () => {
                 <p className="text-md text-gray-600 dark:text-gray-300">
                   Correct: {analytics.correct} | Incorrect: {analytics.incorrect}
                 </p>
+                {simulationId && (
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    Simulation ID: {simulationId}
+                  </p>
+                )}
+
 
 
               <TimelineViewer timeline={timeline} />

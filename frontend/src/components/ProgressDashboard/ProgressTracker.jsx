@@ -17,34 +17,31 @@ Changelog:
 */
 
 
-import React, { useState } from "react";
-
-const mockData = [
-  {
-    id: 1,
-    scenario: "Phishing Attack Response",
-    date: "2025-06-01",
-    score: 85,
-    status: "Passed",
-  },
-  {
-    id: 2,
-    scenario: "Insider Threat Detection",
-    date: "2025-06-02",
-    score: 72,
-    status: "Passed",
-  },
-  {
-    id: 3,
-    scenario: "Ransomware Containment",
-    date: "2025-06-03",
-    score: 48,
-    status: "Failed",
-  },
-];
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 
 const ProgressTracker = () => {
-  const [data] = useState(mockData);
+  const [data, setData] = useState([]);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!user) return;
+      const ids = JSON.parse(localStorage.getItem("simulationIds") || "[]");
+      try {
+        const responses = await Promise.all(
+          ids.map((id) =>
+            axios.get(`https://api.redroomsim.com/progress/${user.email}/${id}`)
+          )
+        );
+        setData(responses.map((r) => r.data));
+      } catch (err) {
+        console.error("Failed to fetch progress", err);
+      }
+    };
+    fetchProgress();
+  }, [user]);
 
   return (
     <div className="p-4 sm:p-6">
@@ -55,19 +52,17 @@ const ProgressTracker = () => {
         <thead className="bg-[#111827] text-white">
           <tr>
             <th className="py-3 px-6 text-left">Scenario</th>
-            <th className="py-3 px-6 text-left">Date</th>
             <th className="py-3 px-6 text-left">Score</th>
             <th className="py-3 px-6 text-left">Status</th>
           </tr>
         </thead>
         <tbody>
           {data.map((entry) => (
-            <tr key={entry.id} className="border-b border-gray-200 dark:border-gray-700">
-              <td className="py-3 px-6">{entry.scenario}</td>
-              <td className="py-3 px-6">{entry.date}</td>
-              <td className="py-3 px-6">{entry.score}%</td>
-              <td className={`py-3 px-6 font-semibold ${entry.status === "Passed" ? "text-green-600" : "text-red-600"}`}>
-                {entry.status}
+            <tr key={entry.simulation_id} className="border-b border-gray-200 dark:border-gray-700">
+              <td className="py-3 px-6">{entry.name}</td>
+              <td className="py-3 px-6">{entry.score ?? "-"}</td>
+              <td className={`py-3 px-6 font-semibold ${entry.completed ? "text-green-600" : "text-red-600"}`}>
+                {entry.completed ? "Completed" : "Incomplete"}
               </td>
             </tr>
           ))}
