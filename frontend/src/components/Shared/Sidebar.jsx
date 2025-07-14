@@ -19,7 +19,7 @@ Changelog:
 */
 
 // Import necessary libraries and components
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import logo from "../../assets/logo.png";
@@ -27,6 +27,7 @@ import logo from "../../assets/logo.png";
 // Sidebar component renders the navigation sidebar with links and user role-based menu items
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { user, role } = useAuth();
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
 
   return (
     <div
@@ -67,10 +68,26 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
         {role === "admin" && (
           <>
-            <Link to="/admin" className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+            <button
+              onClick={() => setAdminMenuOpen(!adminMenuOpen)}
+              className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 w-full text-left"
+            >
               <span className="text-2xl">⚙️</span>
               {isOpen && <span>Admin Panel</span>}
-            </Link>
+              {isOpen && (
+                <span className={`ml-auto transform transition-transform ${adminMenuOpen ? 'rotate-90' : ''}`}>▶</span>
+              )}
+            </button>
+            {isOpen && adminMenuOpen && (
+              <div className="ml-8 mt-1 flex flex-col space-y-1">
+                <Link to="/admin/users" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Manage Users</Link>
+                <Link to="/admin/pending-users" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Pending Approvals</Link>
+                <Link to="/admin/monitoring" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">User Monitoring</Link>
+                <Link to="/admin/audit-log" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Audit Log</Link>
+                <Link to="/admin/scenario-config" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Scenario Config</Link>
+                <Link to="/admin/difficulty" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Difficulty</Link>
+              </div>
+            )}
             <Link to="/upload" className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
               <span className="text-2xl">📤</span>
               {isOpen && <span>Upload Evidence</span>}
