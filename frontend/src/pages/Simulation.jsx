@@ -126,6 +126,29 @@ const Simulation = () => {
     saveProgress();
   }, [completed, user, scenario, scenarioId, score]);
 
+  useEffect(() => {
+    return () => {
+      if (!completed && user && scenario) {
+        axios
+          .post("https://api.redroomsim.com/progress/save", {
+            scenario_id: scenarioId,
+            name: scenario.name,
+            username: user.email,
+            score: score,
+            completed: false,
+          })
+          .then((res) => {
+            const simId = res.data.simulation_id;
+            const existing = JSON.parse(localStorage.getItem("simulationIds") || "[]");
+            localStorage.setItem("simulationIds", JSON.stringify([...existing, simId]));
+          })
+          .catch((err) => {
+            console.error("Failed to save progress", err);
+          });
+      }
+    };
+  }, [completed, user, scenario, scenarioId, score]);
+
   if (!scenario) return <div className="p-6">Loading scenario...</div>;
 
   const step = scenario.steps[currentStepIndex];
