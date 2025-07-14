@@ -38,6 +38,7 @@ const Simulation = () => {
   const [endTime, setEndTime] = useState(null);
   const [lastStepTimestamp, setLastStepTimestamp] = useState(null);
   const [simulationId, setSimulationId] = useState(null);
+  const [endedEarly, setEndedEarly] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -104,9 +105,31 @@ const Simulation = () => {
     }
   };
 
+  const handleEndSimulation = async () => {
+    if (!user || !scenario) return;
+    setEndedEarly(true);
+    setCompleted(true);
+    setAnalytics((prev) => ({ ...prev, endTime: Date.now() }));
+    try {
+      const response = await axios.post("https://api.redroomsim.com/progress/save", {
+        scenario_id: scenarioId,
+        name: scenario.name,
+        username: user.email,
+        score: score,
+        completed: false,
+      });
+      const simId = response.data.simulation_id;
+      setSimulationId(simId);
+      const existing = JSON.parse(localStorage.getItem("simulationIds") || "[]");
+      localStorage.setItem("simulationIds", JSON.stringify([...existing, simId]));
+    } catch (err) {
+      console.error("Failed to save progress", err);
+    }
+  };
+
   useEffect(() => {
     const saveProgress = async () => {
-      if (!completed || !user || !scenario) return;
+      if (!completed || endedEarly || !user || !scenario) return;
       try {
         const response = await axios.post("https://api.redroomsim.com/progress/save", {
           scenario_id: scenarioId,
@@ -165,7 +188,9 @@ const Simulation = () => {
           {completed ? (
             <div className="text-center space-y-4">
               
-                <p className="text-xl">🎉 Simulation Complete!</p>
+                <p className="text-xl">
+                  {endedEarly ? "Simulation Ended" : "🎉 Simulation Complete!"}
+                </p>
                 <p className="text-lg">Score: {score} / {scenario.steps.length}</p>
                 <p className="text-md text-gray-600 dark:text-gray-300">
                   Duration: {totalDurationSec} seconds
@@ -216,6 +241,14 @@ const Simulation = () => {
                     </div>
                   </>
                 )}
+                <div className="flex justify-end mt-4">
+                  <button
+                    onClick={handleEndSimulation}
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                  >
+                    End Simulation
+                  </button>
+                </div>
               </div>
             )}
           </div>
