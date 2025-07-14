@@ -20,6 +20,7 @@ Changelog:
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
+import SimulationSummaryCard from "./SimulationSummaryCard";
 
 const ProgressTracker = () => {
   const [data, setData] = useState([]);
@@ -46,28 +47,10 @@ const ProgressTracker = () => {
   return (
     <div className="p-4 sm:p-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Progress Dashboard</h2>
-
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden text-gray-900 dark:text-white">
-        <thead className="bg-[#111827] text-white">
-          <tr>
-            <th className="py-3 px-6 text-left">Scenario</th>
-            <th className="py-3 px-6 text-left">Score</th>
-            <th className="py-3 px-6 text-left">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((entry) => (
-            <tr key={entry.simulation_id} className="border-b border-gray-200 dark:border-gray-700">
-              <td className="py-3 px-6">{entry.name}</td>
-              <td className="py-3 px-6">{entry.score ?? "-"}</td>
-              <td className={`py-3 px-6 font-semibold ${entry.completed ? "text-green-600" : "text-red-600"}`}>
-                {entry.completed ? "Completed" : "Incomplete"}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-        </table>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {data.map((entry) => (
+          <SimulationSummaryCard key={entry.simulation_id} simulation={entry} />
+        ))}
       </div>
     </div>
   );

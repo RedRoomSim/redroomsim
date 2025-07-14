@@ -54,6 +54,29 @@ const Simulation = () => {
     fetchScenario();
   }, [scenarioId]);
 
+  useEffect(() => {
+    const createRecord = async () => {
+      if (!scenario || !user || simulationId) return;
+      const id = crypto.randomUUID();
+      setSimulationId(id);
+      try {
+        await axios.post("https://api.redroomsim.com/progress/save", {
+          sim_uuid: id,
+          scenario_id: scenarioId,
+          name: scenario.name,
+          username: user.email,
+          score: 0,
+          completed: false,
+        });
+        const existing = JSON.parse(localStorage.getItem("simulationIds") || "[]");
+        localStorage.setItem("simulationIds", JSON.stringify([...existing, id]));
+      } catch (err) {
+        console.error("Failed to start simulation", err);
+      }
+    };
+    createRecord();
+  }, [scenario, user, simulationId, scenarioId]);
+
   const handleOptionSelect = (index) => {
     if (selectedOption !== null) return;
 
@@ -92,6 +115,18 @@ const Simulation = () => {
         timeMs: stepTime,
       },
     ]);
+
+    if (simulationId) {
+      axios
+        .post("https://api.redroomsim.com/progress/step", {
+          sim_uuid: simulationId,
+          step_index: currentStepIndex,
+          decision: step.options[index],
+          feedback: stepFeedback,
+          time_ms: stepTime,
+        })
+        .catch((err) => console.error("Failed to save step", err));
+    }
   };
 
   const handleNextStep = () => {
@@ -111,17 +146,14 @@ const Simulation = () => {
     setCompleted(true);
     setAnalytics((prev) => ({ ...prev, endTime: Date.now() }));
     try {
-      const response = await axios.post("https://api.redroomsim.com/progress/save", {
+      await axios.post("https://api.redroomsim.com/progress/save", {
+        sim_uuid: simulationId,
         scenario_id: scenarioId,
         name: scenario.name,
         username: user.email,
         score: score,
         completed: false,
       });
-      const simId = response.data.simulation_id;
-      setSimulationId(simId);
-      const existing = JSON.parse(localStorage.getItem("simulationIds") || "[]");
-      localStorage.setItem("simulationIds", JSON.stringify([...existing, simId]));
     } catch (err) {
       console.error("Failed to save progress", err);
     }
@@ -129,41 +161,34 @@ const Simulation = () => {
 
   useEffect(() => {
     const saveProgress = async () => {
-      if (!completed || endedEarly || !user || !scenario) return;
+      if (!completed || endedEarly || !user || !scenario || !simulationId) return;
       try {
-        const response = await axios.post("https://api.redroomsim.com/progress/save", {
+        await axios.post("https://api.redroomsim.com/progress/save", {
+          sim_uuid: simulationId,
           scenario_id: scenarioId,
           name: scenario.name,
           username: user.email,
           score: score,
           completed: true,
         });
-        const simId = response.data.simulation_id;
-        setSimulationId(simId);
-        const existing = JSON.parse(localStorage.getItem("simulationIds") || "[]");
-        localStorage.setItem("simulationIds", JSON.stringify([...existing, simId]));
       } catch (err) {
         console.error("Failed to save progress", err);
       }
     };
     saveProgress();
-  }, [completed, user, scenario, scenarioId, score]);
+  }, [completed, user, scenario, scenarioId, score, simulationId]);
 
   useEffect(() => {
     return () => {
-      if (!completed && user && scenario) {
+      if (!completed && user && scenario && simulationId) {
         axios
           .post("https://api.redroomsim.com/progress/save", {
+            sim_uuid: simulationId,
             scenario_id: scenarioId,
             name: scenario.name,
             username: user.email,
             score: score,
             completed: false,
-          })
-          .then((res) => {
-            const simId = res.data.simulation_id;
-            const existing = JSON.parse(localStorage.getItem("simulationIds") || "[]");
-            localStorage.setItem("simulationIds", JSON.stringify([...existing, simId]));
           })
           .catch((err) => {
             console.error("Failed to save progress", err);
@@ -181,7 +206,15 @@ const Simulation = () => {
     : null;
 
   return (
-      <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <div className="relative p-6 max-w-4xl mx-auto space-y-6">
+          {!completed && (
+            <button
+              onClick={handleEndSimulation}
+              className="absolute right-4 top-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              End Simulation
+            </button>
+          )}
           <h2 className="text-3xl font-bold text-center mb-2">{scenario.name}</h2>
           <ScoringBar score={scorePercent} />
 
@@ -241,14 +274,6 @@ const Simulation = () => {
                     </div>
                   </>
                 )}
-                <div className="flex justify-end mt-4">
-                  <button
-                    onClick={handleEndSimulation}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                  >
-                    End Simulation
-                  </button>
-                </div>
               </div>
             )}
           </div>
