@@ -48,7 +48,7 @@ const ProgressTracker = () => {
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Progress Dashboard</h2>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden text-gray-900 dark:text-white">
+        <table className="min-w-full bg-white dark:bg-gray-750 shadow-md rounded-lg overflow-hidden text-gray-900 dark:text-white">
         <thead className="bg-[#111827] text-white">
           <tr>
             <th className="py-3 px-6 text-left">Scenario</th>
