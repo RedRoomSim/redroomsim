@@ -29,3 +29,13 @@ CREATE TABLE redroomsimdb.simulation_progress (
     completed BOOLEAN,
     created_at TIMESTAMP DEFAULT now()
 );
+
+CREATE TABLE redroomsimdb.simulation_step_progress (
+    id SERIAL PRIMARY KEY,
+    sim_uuid UUID NOT NULL REFERENCES redroomsimdb.simulation_progress(sim_uuid),
+    step_index INTEGER NOT NULL,
+    decision TEXT NOT NULL,
+    feedback TEXT,
+    time_ms INTEGER,
+    created_at TIMESTAMP DEFAULT now()
+);

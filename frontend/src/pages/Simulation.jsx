@@ -54,6 +54,31 @@ const Simulation = () => {
     fetchScenario();
   }, [scenarioId]);
 
+  // initialize progress record when scenario and user are available
+  useEffect(() => {
+    const createProgress = async () => {
+      if (!user || !scenario || simulationId) return;
+      try {
+        const response = await axios.post("https://api.redroomsim.com/progress/save", {
+          scenario_id: scenarioId,
+          name: scenario.name,
+          username: user.email,
+          score: 0,
+          completed: false,
+        });
+        const simId = response.data.simulation_id;
+        setSimulationId(simId);
+        const existing = JSON.parse(localStorage.getItem("simulationIds") || "[]");
+        if (!existing.includes(simId)) {
+          localStorage.setItem("simulationIds", JSON.stringify([...existing, simId]));
+        }
+      } catch (err) {
+        console.error("Failed to init progress", err);
+      }
+    };
+    createProgress();
+  }, [user, scenario, scenarioId, simulationId]);
+
   const handleOptionSelect = (index) => {
     if (selectedOption !== null) return;
 
@@ -92,6 +117,18 @@ const Simulation = () => {
         timeMs: stepTime,
       },
     ]);
+
+    if (simulationId) {
+      axios.post("https://api.redroomsim.com/progress/step", {
+        sim_uuid: simulationId,
+        step_index: currentStepIndex,
+        decision: step.options[index],
+        feedback: stepFeedback,
+        time_ms: stepTime,
+      }).catch((err) => {
+        console.error("Failed to save step", err);
+      });
+    }
   };
 
   const handleNextStep = () => {
@@ -111,17 +148,14 @@ const Simulation = () => {
     setCompleted(true);
     setAnalytics((prev) => ({ ...prev, endTime: Date.now() }));
     try {
-      const response = await axios.post("https://api.redroomsim.com/progress/save", {
+      await axios.post("https://api.redroomsim.com/progress/save", {
         scenario_id: scenarioId,
         name: scenario.name,
         username: user.email,
         score: score,
         completed: false,
+        sim_uuid: simulationId,
       });
-      const simId = response.data.simulation_id;
-      setSimulationId(simId);
-      const existing = JSON.parse(localStorage.getItem("simulationIds") || "[]");
-      localStorage.setItem("simulationIds", JSON.stringify([...existing, simId]));
     } catch (err) {
       console.error("Failed to save progress", err);
     }
@@ -131,23 +165,20 @@ const Simulation = () => {
     const saveProgress = async () => {
       if (!completed || endedEarly || !user || !scenario) return;
       try {
-        const response = await axios.post("https://api.redroomsim.com/progress/save", {
+        await axios.post("https://api.redroomsim.com/progress/save", {
           scenario_id: scenarioId,
           name: scenario.name,
           username: user.email,
           score: score,
           completed: true,
+          sim_uuid: simulationId,
         });
-        const simId = response.data.simulation_id;
-        setSimulationId(simId);
-        const existing = JSON.parse(localStorage.getItem("simulationIds") || "[]");
-        localStorage.setItem("simulationIds", JSON.stringify([...existing, simId]));
       } catch (err) {
         console.error("Failed to save progress", err);
       }
     };
     saveProgress();
-  }, [completed, user, scenario, scenarioId, score]);
+  }, [completed, user, scenario, scenarioId, score, simulationId]);
 
   useEffect(() => {
     return () => {
@@ -159,18 +190,14 @@ const Simulation = () => {
             username: user.email,
             score: score,
             completed: false,
-          })
-          .then((res) => {
-            const simId = res.data.simulation_id;
-            const existing = JSON.parse(localStorage.getItem("simulationIds") || "[]");
-            localStorage.setItem("simulationIds", JSON.stringify([...existing, simId]));
+            sim_uuid: simulationId,
           })
           .catch((err) => {
             console.error("Failed to save progress", err);
           });
       }
     };
-  }, [completed, user, scenario, scenarioId, score]);
+  }, [completed, user, scenario, scenarioId, score, simulationId]);
 
   if (!scenario) return <div className="p-6">Loading scenario...</div>;
 

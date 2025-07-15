@@ -14,3 +14,16 @@ class SimulationProgress(Base):
     completed = Column(Boolean)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
+
+class SimulationStepProgress(Base):
+    __tablename__ = "simulation_step_progress"
+    __table_args__ = {"schema": "redroomsimdb"}
+
+    id = Column(Integer, primary_key=True, index=True)
+    sim_uuid = Column(String, nullable=False, index=True)
+    step_index = Column(Integer, nullable=False)
+    decision = Column(String, nullable=False)
+    feedback = Column(String)
+    time_ms = Column(Integer)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
