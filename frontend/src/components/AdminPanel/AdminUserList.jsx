@@ -61,6 +61,14 @@ const AdminUserList = () => {
     setEditForm({ ...user });
   };
 
+  const toggleAccountStatus = async (user) => {
+    const userRef = doc(db, "users", user.id);
+    const newStatus = !user.disabled;
+    await updateDoc(userRef, { disabled: newStatus });
+    setUsers(prev => prev.map(u => u.id === user.id ? { ...u, disabled: newStatus } : u));
+    setFilteredUsers(prev => prev.map(u => u.id === user.id ? { ...u, disabled: newStatus } : u));
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditForm(prev => ({ ...prev, [name]: value }));
@@ -124,9 +132,20 @@ const AdminUserList = () => {
                 <td className="px-4 py-2">{user.role}</td>
                 <td className="px-4 py-2">{user.designation}</td>
                 <td className="px-4 py-2">
-                  <button onClick={() => handleEditClick(user)} className="text-blue-600 hover:underline">
-                    Edit
-                  </button>
+                  <div className="flex items-center gap-4">
+                    <button onClick={() => handleEditClick(user)} className="text-blue-600 hover:underline">
+                      Edit
+                    </button>
+                    <label className="inline-flex relative items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={!user.disabled}
+                        onChange={() => toggleAccountStatus(user)}
+                      />
+                      <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:bg-red-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                    </label>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -141,13 +160,48 @@ const AdminUserList = () => {
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-md">
             <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Edit User</h3>
             <div className="space-y-3">
-              <input name="firstName" value={editForm.firstName} onChange={handleChange} placeholder="First Name" className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white" />
-              <input name="lastName" value={editForm.lastName} onChange={handleChange} placeholder="Last Name" className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white" />
-              <input name="designation" value={editForm.designation} onChange={handleChange} placeholder="Designation" className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white" />
-              <select name="role" value={editForm.role} onChange={handleChange} className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white">
-                <option value="student">Student</option>
-                <option value="admin">Admin</option>
-              </select>
+              <div>
+                <label className="block font-semibold mb-1">First Name</label>
+                <input
+                  name="firstName"
+                  value={editForm.firstName}
+                  onChange={handleChange}
+                  placeholder="First Name"
+                  className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Last Name</label>
+                <input
+                  name="lastName"
+                  value={editForm.lastName}
+                  onChange={handleChange}
+                  placeholder="Last Name"
+                  className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Designation</label>
+                <input
+                  name="designation"
+                  value={editForm.designation}
+                  onChange={handleChange}
+                  placeholder="Designation"
+                  className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Role</label>
+                <select
+                  name="role"
+                  value={editForm.role}
+                  onChange={handleChange}
+                  className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="student">Student</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
             </div>
             <div className="flex justify-end gap-4 mt-4">
               <button onClick={() => setSelectedUser(null)} className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white">Cancel</button>
