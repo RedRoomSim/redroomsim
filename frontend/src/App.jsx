@@ -58,7 +58,7 @@ const App = () => {
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/redirect" element={<SecureRoute><RoleBasedRedirect /></SecureRoute>} />
-            {/* <Route path="/admin" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><Admin /></Layout></RoleProtectedRoute></SecureRoute>} /> */}
+            <Route path="/admin" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><Admin /></Layout></RoleProtectedRoute></SecureRoute>} />
             <Route path="/admin/pending-users" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminPendingUsers /></Layout></RoleProtectedRoute></SecureRoute>} />
             <Route path="/admin/users" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminUserList /></Layout></RoleProtectedRoute></SecureRoute>} />
             <Route path="/admin/monitoring" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminMonitoringPage /></Layout></RoleProtectedRoute></SecureRoute>} />
