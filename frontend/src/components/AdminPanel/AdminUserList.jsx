@@ -67,6 +67,10 @@ const AdminUserList = () => {
     await updateDoc(userRef, { disabled: newStatus });
     setUsers(prev => prev.map(u => u.id === user.id ? { ...u, disabled: newStatus } : u));
     setFilteredUsers(prev => prev.map(u => u.id === user.id ? { ...u, disabled: newStatus } : u));
+    if (selectedUser && selectedUser.id === user.id) {
+      setSelectedUser(prev => ({ ...prev, disabled: newStatus }));
+      setEditForm(prev => ({ ...prev, disabled: newStatus }));
+    }
   };
 
   const handleChange = (e) => {
@@ -200,11 +204,11 @@ const AdminUserList = () => {
                   <input
                     type="checkbox"
                     className="sr-only peer"
-                    checked={!user.disabled}
-                    onChange={() => toggleAccountStatus(user)}
+                    checked={!selectedUser.disabled}
+                    onChange={() => toggleAccountStatus(selectedUser)}
                   />
                   <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:bg-red-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-              </div>  
+              </div>
             </div>
             <div className="flex justify-end gap-4 mt-4">
               <button onClick={() => setSelectedUser(null)} className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white">Cancel</button>
