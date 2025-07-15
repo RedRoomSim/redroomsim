@@ -2,15 +2,18 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase/firebaseConfig";
+import { useAuth } from "../../context/AuthContext";
 
 const NotificationBell = () => {
   const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
+  const { role } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       const notes = [];
-      try {
+    try {
+      if (role === "admin") {
         const querySnapshot = await getDocs(collection(db, "users"));
         const pending = querySnapshot.docs.filter(doc => doc.data().role === "pending");
         if (pending.length > 0) {
@@ -20,9 +23,10 @@ const NotificationBell = () => {
             link: "/admin/pending-users"
           });
         }
-      } catch (err) {
-        console.error("Failed to fetch users", err);
       }
+    } catch (err) {
+      console.error("Failed to fetch users", err);
+    }
 
       try {
         const response = await axios.get("https://api.redroomsim.com/sim/list");
@@ -32,7 +36,7 @@ const NotificationBell = () => {
           notes.push({
             id: "scenario",
             message: "New scenario uploaded",
-            link: "/admin/scenario-config"
+            link: role === "admin" ? "/admin/scenario-config" : "/scenarios"
           });
         }
         localStorage.setItem("scenarioCount", String(scenarioCount));
@@ -44,7 +48,7 @@ const NotificationBell = () => {
     };
 
     fetchData();
-  }, []);
+  }, [role]);
 
   return (
     <div className="relative">
@@ -65,6 +69,11 @@ const NotificationBell = () => {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+      {open && notifications.length === 0 && (
+        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg z-50">
+          <div className="p-2 text-sm text-gray-900 dark:text-white">No new notifications.</div>
         </div>
       )}
     </div>
