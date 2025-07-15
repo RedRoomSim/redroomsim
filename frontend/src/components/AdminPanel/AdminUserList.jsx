@@ -200,14 +200,16 @@ const AdminUserList = () => {
                 </select>
               </div>
               <div>
-                <label className="inline-flex relative items-center cursor-pointer">Account Status</label>
+                <label className="inline-flex relative items-center cursor-pointer">
                   <input
                     type="checkbox"
                     className="sr-only peer"
                     checked={!selectedUser.disabled}
                     onChange={() => toggleAccountStatus(selectedUser)}
                   />
-                  <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:bg-red-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                  <div className="relative w-11 h-6 bg-gray-200 rounded-full peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-red-600 dark:bg-gray-700 peer-checked:bg-red-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white" />
+                  <span className="ml-3">Account Status</span>
+                </label>
               </div>
             </div>
             <div className="flex justify-end gap-4 mt-4">
