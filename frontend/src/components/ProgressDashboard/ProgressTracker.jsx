@@ -83,7 +83,7 @@ const ProgressTracker = () => {
               </td>
               <td className="py-3 px-6">
                 <button onClick={() => toggleTimeline(entry.simulation_id)} className="text-blue-600 dark:text-blue-400 underline">
-                  {timelines[entry.simulation_id] ? "Hide" : "View"}
+                  {timelines[entry.simulation_id] ? "Hide" : "Timeline"}
                 </button>
               </td>
             </tr>
