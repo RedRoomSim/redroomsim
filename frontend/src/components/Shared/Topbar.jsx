@@ -22,6 +22,7 @@ import { useAuth } from "../../context/AuthContext";
 import userAvatar from "../../assets/user.png";
 import logo from "../../assets/logo.png";
 import logoutImage from "../../assets/logout.png";
+import NotificationBell from "./NotificationBell";
 
 const Topbar = ({ sidebarOpen, toggleSidebar }) => {
   const { logout } = useAuth();
@@ -98,6 +99,7 @@ const Topbar = ({ sidebarOpen, toggleSidebar }) => {
           <Link to="/contact" className="hover:text-red-600" title="Contact">
             <span className="text-2xl">📞</span>
           </Link>
+          <NotificationBell />
           <Link to="/settings" className="hover:text-red-600" title="Settings">
             <span className="text-2xl">⚙️</span>
           </Link>
