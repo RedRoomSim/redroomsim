@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from db import SessionLocal
-from models.progress_models import SimulationProgress
+from models.progress_models import SimulationProgress, SimulationStepProgress
 from pydantic import BaseModel
 import uuid
 
@@ -13,24 +13,64 @@ class ProgressIn(BaseModel):
     username: str
     score: int | None = None
     completed: bool | None = None
+    sim_uuid: str | None = None
+
+
+class StepProgressIn(BaseModel):
+    sim_uuid: str
+    step_index: int
+    decision: str
+    feedback: str | None = None
+    time_ms: int | None = None
 
 @progress_router.post("/save")
 def save_progress(progress: ProgressIn):
     db = SessionLocal()
     try:
-        sim_uuid = str(uuid.uuid4())
-        record = SimulationProgress(
-            sim_uuid=sim_uuid,
-            scenario_id=progress.scenario_id,
-            name=progress.name,
-            username=progress.username,
-            score=progress.score,
-            completed=progress.completed,
+        if progress.sim_uuid:
+            record = db.query(SimulationProgress).filter_by(sim_uuid=progress.sim_uuid).first()
+            if not record:
+                raise HTTPException(status_code=404, detail="Simulation not found")
+            record.score = progress.score
+            record.completed = progress.completed
+            db.commit()
+            db.refresh(record)
+            return {"simulation_id": record.sim_uuid}
+        else:
+            sim_uuid = str(uuid.uuid4())
+            record = SimulationProgress(
+                sim_uuid=sim_uuid,
+                scenario_id=progress.scenario_id,
+                name=progress.name,
+                username=progress.username,
+                score=progress.score,
+                completed=progress.completed,
+            )
+            db.add(record)
+            db.commit()
+            db.refresh(record)
+            return {"simulation_id": sim_uuid}
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+
+@progress_router.post("/step")
+def save_step_progress(step: StepProgressIn):
+    db = SessionLocal()
+    try:
+        record = SimulationStepProgress(
+            sim_uuid=step.sim_uuid,
+            step_index=step.step_index,
+            decision=step.decision,
+            feedback=step.feedback,
+            time_ms=step.time_ms,
         )
         db.add(record)
         db.commit()
-        db.refresh(record)
-        return {"simulation_id": sim_uuid}
+        return {"status": "saved"}
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
@@ -56,6 +96,31 @@ def get_progress(username: str, simulation_id: str):
             "completed": record.completed,
             "simulation_id": record.sim_uuid,
         }
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
+
+@progress_router.get("/timeline/{simulation_id}")
+def get_timeline(simulation_id: str):
+    db = SessionLocal()
+    try:
+        records = (
+            db.query(SimulationStepProgress)
+            .filter_by(sim_uuid=simulation_id)
+            .order_by(SimulationStepProgress.step_index)
+            .all()
+        )
+        return [
+            {
+                "decision": r.decision,
+                "feedback": r.feedback,
+                "timeMs": r.time_ms,
+                "step_index": r.step_index,
+            }
+            for r in records
+        ]
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=str(e))
     finally:
