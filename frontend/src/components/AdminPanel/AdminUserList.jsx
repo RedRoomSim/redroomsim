@@ -121,6 +121,7 @@ const AdminUserList = () => {
               <th className="px-4 py-2">Email</th>
               <th className="px-4 py-2">Role</th>
               <th className="px-4 py-2">Designation</th>
+              <th className="px-4 py-2">Account Status</th>
               <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
@@ -131,20 +132,12 @@ const AdminUserList = () => {
                 <td className="px-4 py-2">{user.email}</td>
                 <td className="px-4 py-2">{user.role}</td>
                 <td className="px-4 py-2">{user.designation}</td>
+                <td className="px-4 py-2">{user.disabled ? "Disabled" : "Active"}</td>
                 <td className="px-4 py-2">
                   <div className="flex items-center gap-4">
                     <button onClick={() => handleEditClick(user)} className="text-blue-600 hover:underline">
                       Edit
                     </button>
-                    <label className="inline-flex relative items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        checked={!user.disabled}
-                        onChange={() => toggleAccountStatus(user)}
-                      />
-                      <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:bg-red-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                    </label>
                   </div>
                 </td>
               </tr>
@@ -202,6 +195,17 @@ const AdminUserList = () => {
                   <option value="admin">Admin</option>
                 </select>
               </div>
+              <div className="flex items-center">
+                <label className="inline-flex relative items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={!user.disabled}
+                    onChange={() => toggleAccountStatus(user)}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:bg-red-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                </label>
+              </div>  
             </div>
             <div className="flex justify-end gap-4 mt-4">
               <button onClick={() => setSelectedUser(null)} className="px-4 py-2 rounded bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white">Cancel</button>
