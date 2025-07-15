@@ -70,6 +70,7 @@ def save_step_progress(step: StepProgressIn):
         )
         db.add(record)
         db.commit()
+        db.refresh(record)
         return {"status": "saved"}
     except SQLAlchemyError as e:
         db.rollback()

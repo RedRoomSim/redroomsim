@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, func
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, ForeignKey
 from db import Base
 
 class SimulationProgress(Base):
@@ -20,7 +20,12 @@ class SimulationStepProgress(Base):
     __table_args__ = {"schema": "redroomsimdb"}
 
     id = Column(Integer, primary_key=True, index=True)
-    sim_uuid = Column(String, nullable=False, index=True)
+    sim_uuid = Column(
+        String,
+        ForeignKey("redroomsimdb.simulation_progress.sim_uuid"),
+        nullable=False,
+        index=True,
+    )
     step_index = Column(Integer, nullable=False)
     decision = Column(String, nullable=False)
     feedback = Column(String)
