@@ -54,13 +54,7 @@ const App = () => {
       <AuthProvider>
         <Router>
           <Routes>
-            {/*
-              The root path should respect the current authentication state.
-              Wrapping RoleBasedRedirect with SecureRoute ensures that a logged-in
-              user is redirected based on their role, while unauthenticated
-              visitors are sent to the login page.
-            */}
-            <Route path="/" element={<SecureRoute><RoleBasedRedirect /></SecureRoute>} />
+            <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/redirect" element={<SecureRoute><RoleBasedRedirect /></SecureRoute>} />
