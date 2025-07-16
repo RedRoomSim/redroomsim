@@ -50,103 +50,107 @@ export const AuthProvider = ({ children }) => {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(userRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          setCurrentUser(user);
-          setRole(data.role || "pending");
-          setLoading(false);
-        }
-      } else {
-        setCurrentUser(null);
-        setRole(null);
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const userRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(userRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setCurrentUser(user);
+        setRole(data.role || "pending");
         setLoading(false);
       }
-    });
-    return () => unsubscribe();
-  }, []);
+    } else {
+      setCurrentUser(null);
+      setRole(null);
+      setLoading(false);
+    }
+  });
+  return () => unsubscribe();
+}, []);
+
 
   const login = async (email, password) => {
+  try {
+    // Step 1: Sign in using Firebase Auth
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Step 2: Get user Firestore document using UID
+    const userRef = doc(db, "users", user.uid);
+    const docSnap = await getDoc(userRef);
+
+    if (!docSnap.exists()) {
+      return { success: false, message: "User record not found in Firestore." };
+    }
+
+    const userData = docSnap.data();
+
+    if (userData.disabled) {
+      return { success: false, message: "Account disabled due to multiple failed login attempts." };
+    }
+
+    if (userData.role === "pending") {
+      return { success: false, message: "Your account is pending approval. Please wait for an admin to assign a role." };
+    }
+
+    // Step 3: Reset failed login attempts
+    await updateDoc(userRef, {
+      failedAttempt: 0,
+      disabled: false,
+    });
+
+    setCurrentUser(user);
+    setRole(userData.role || "pending");
+
+    // Step 4: Log login activity
+    await axios.post("https://api.redroomsim.com/logs/log-login", {
+      uid: user.uid,
+      email: user.email,
+      role: userData.role || "pending",
+    });
+
+    return { success: true };
+  } catch (error) {
     try {
-      // Check if user exists in Firestore
+      // Step 5: Attempt to log failure — fallback using email (less secure)
       const q = query(collection(db, "users"), where("email", "==", email));
       const snapshot = await getDocs(q);
+      let uid = null;
+      let role = "unknown";
 
-      if (snapshot.empty) {
-        return { success: false, message: "Firebase: Error (auth/invalid-credential)." };
-      }
+      if (!snapshot.empty) {
+        const found = snapshot.docs[0];
+        const ref = doc(db, "users", found.id);
+        const userData = found.data();
+        uid = found.id;
+        role = userData.role || "unknown";
+        const currentAttempts = userData.failedAttempt || 0;
 
-      const found = snapshot.docs[0];
-      const uid = found.id;
-      const userData = found.data();
+        const updates = {
+          failedAttempt: currentAttempts + 1,
+        };
 
-      if (userData.disabled) {
-        return { success: false, message: "Account disabled due to multiple failed login attempts." };
-      }
-      if (userData.role === "pending") {
-        return { success: false, message: "Your account is pending approval. Please wait for an admin to assign a role." };
-      }
-      // Try Firebase Auth login
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-
-      // Reset login attempts
-      await updateDoc(doc(db, "users", uid), {
-        failedAttempt: 0,
-        disabled: false,
-      });
-
-      setCurrentUser(userCredential.user);
-      setRole(userData.role || "pending");
-      
-      // Log login activity to backend
-      await axios.post("https://api.redroomsim.com/logs/log-login", {
-        uid: userCredential.user.uid,
-        email: userCredential.user.email,
-        role: userData.role || "pending",
-      });
-
-      return { success: true };
-    } catch (error) {
-      try {
-        // Track failed login
-        const q = query(collection(db, "users"), where("email", "==", email));
-        const snapshot = await getDocs(q);
-        let uid = null;
-        let role = "unknown";
-        if (!snapshot.empty) {
-          const found = snapshot.docs[0];
-          const ref = doc(db, "users", found.id);
-          const userData = found.data();
-          uid = found.id;
-          role = userData.role || "unknown";
-          const currentAttempts = userData.failedAttempt || 0;
-
-          const updates = {
-            failedAttempt: currentAttempts + 1,
-          };
-
-          if (currentAttempts + 1 >= 3) {
-            updates.disabled = true;
-          }
-
-          await updateDoc(ref, updates);
+        if (currentAttempts + 1 >= 3) {
+          updates.disabled = true;
         }
-        await axios.post("https://api.redroomsim.com/logs/log-failed-login", {
-          uid,
-          email,
-          role,
-        });
-      } catch (innerError) {
-        console.error("Error tracking login failure:", innerError);
+
+        await updateDoc(ref, updates);
       }
 
-      return { success: false, message: error.message };
+      await axios.post("https://api.redroomsim.com/logs/log-failed-login", {
+        uid,
+        email,
+        role,
+      });
+    } catch (innerError) {
+      console.error("Error tracking login failure:", innerError);
     }
-  };
+
+    return { success: false, message: error.message };
+  }
+};
 
   const logout = async () => {
     if (currentUser) {
