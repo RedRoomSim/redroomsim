@@ -269,7 +269,7 @@ const Simulation = () => {
                 {simulationId && (
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Simulation ID: {simulationId}
-                  </p> {/* corrected attribute name */}
+                  </p> // corrected attribute name
                 )}
 
                 {Object.keys(mitreScores).length > 0 && (
