@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, HTTPException
 from db import SessionLocal
 from models.logging_models import UserLoginLog
+from services.audit_service import record_audit_event
 
 router = APIRouter()
 
@@ -19,6 +20,8 @@ async def log_user_login(request: Request):
         )
         db.add(log_entry)
         db.commit()
+        # Record this login in the audit log
+        record_audit_event(actor=data["email"], action="login")
         return {"message": "Login logged"}
     except Exception as e:
         db.rollback()
@@ -39,6 +42,8 @@ async def log_logout(request: Request):
         )
         db.add(log)
         db.commit()
+        # Capture logouts as part of the audit trail
+        record_audit_event(actor=data["email"], action="logout")
         return {"message": "Logout logged"}
     except Exception as e:
         db.rollback()
@@ -61,6 +66,8 @@ async def log_failed_login(request: Request):
         )
         db.add(log_entry)
         db.commit()
+        # Track failed attempts to help with security reviews
+        record_audit_event(actor=data.get("email"), action="failed_login")
         return {"message": "Failed login logged"}
     except Exception as e:
         db.rollback()
@@ -81,6 +88,8 @@ async def log_password_change(request: Request):
         )
         db.add(log)
         db.commit()
+        # Log any password changes
+        record_audit_event(actor=data["email"], action="password_change")
         return {"message": "Password change logged"}
     except Exception as e:
         db.rollback()
@@ -93,6 +102,8 @@ def get_login_activity():
     db = SessionLocal()
     try:
         logs = db.query(UserLoginLog).order_by(UserLoginLog.timestamp.desc()).all()
+        # Viewing the login history is itself auditable
+        record_audit_event(actor=None, action="get_login_activity")
         return [
             {
                 "email": log.email,
