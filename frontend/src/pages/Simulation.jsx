@@ -39,6 +39,11 @@ const Simulation = () => {
   const [lastStepTimestamp, setLastStepTimestamp] = useState(null);
   const [simulationId, setSimulationId] = useState(null);
   const [endedEarly, setEndedEarly] = useState(false);
+  const [showHint, setShowHint] = useState(false); // toggle visibility of hints
+  const [nextStep, setNextStep] = useState(null); // store id of next step when branching
+  const [stepMap, setStepMap] = useState({}); // lookup of step id to index
+  const [retry, setRetry] = useState(false); // flag to retry when option leads to null
+  const [mitreScores, setMitreScores] = useState({}); // cumulative MITRE ATT&CK counts
   const { user } = useAuth();
 
   useEffect(() => {
@@ -46,6 +51,11 @@ const Simulation = () => {
       try {
         const response = await axios.get(`https://api.redroomsim.com/sim/${scenarioId}`);
         setScenario(response.data);
+        const map = {}; // build a map of step id to index for quick lookup
+        response.data.steps.forEach((s, idx) => {
+          map[s.id] = idx; // store mapping for branch navigation
+        });
+        setStepMap(map); // save map in state
         setAnalytics((prev) => ({ ...prev, startTime: Date.now() }));
       } catch (error) {
         console.error("Failed to load scenario", error);
@@ -83,6 +93,8 @@ const Simulation = () => {
     if (selectedOption !== null) return;
 
     const step = scenario.steps[currentStepIndex];
+    const optionObj = step.options[index]; // may be string or object
+    const optionText = optionObj.text || optionObj; // normalize to text
     const correct = step.correct_option;
     const isCorrect = index === correct;
     
@@ -96,11 +108,19 @@ const Simulation = () => {
     setLastStepTimestamp(currentTimestamp);
 
     setSelectedOption(index);
+    const correctText = step.options[correct].text || step.options[correct]; // show correct text even when objects
     const stepFeedback = isCorrect
       ? "✅ Correct!"
-      : `❌ Incorrect. The correct answer was: "${step.options[correct]}"`;
+      : `❌ Incorrect. The correct answer was: "${correctText}"`;
 
     setScore((prev) => (isCorrect ? prev + 1 : prev));
+    if (isCorrect && step.mitre_attack) {
+      // tally MITRE techniques for scoring display
+      setMitreScores((prev) => ({
+        ...prev,
+        [step.mitre_attack]: (prev[step.mitre_attack] || 0) + 1,
+      }));
+    }
     setFeedback(stepFeedback);
 
     setAnalytics((prev) => ({
@@ -112,32 +132,53 @@ const Simulation = () => {
     setTimeline((prev) => [
       ...prev,
       {
-        decision: step.options[index],
+        decision: optionText, // record the actual option text selected
         feedback: stepFeedback,
         timeMs: stepTime,
       },
     ]);
 
     if (simulationId) {
-      axios.post("https://api.redroomsim.com/progress/step", {
-        sim_uuid: simulationId,
-        step_index: currentStepIndex,
-        decision: step.options[index],
-        feedback: stepFeedback,
-        time_ms: stepTime,
-      }).catch((err) => {
-        console.error("Failed to save step", err);
-      });
+      axios
+        .post("https://api.redroomsim.com/progress/step", {
+          sim_uuid: simulationId,
+          step_index: currentStepIndex,
+          decision: optionText,
+          feedback: stepFeedback,
+          time_ms: stepTime,
+        })
+        .catch((err) => {
+          console.error("Failed to save step", err);
+        });
+    }
+
+    const nextId = optionObj.next_step; // branch target id if specified
+    if (nextId === null) {
+      setRetry(true); // null means allow retry instead of progressing
+    } else {
+      setRetry(false);
+    }
+    if (nextId !== undefined && nextId !== null && stepMap[nextId] !== undefined) {
+      setNextStep(stepMap[nextId]); // jump to mapped step if valid
+    } else {
+      setNextStep(currentStepIndex + 1); // default to next sequential step
     }
   };
 
   const handleNextStep = () => {
-    setSelectedOption(null);
-    setFeedback("");
-    if (currentStepIndex + 1 < scenario.steps.length) {
-      setCurrentStepIndex((prev) => prev + 1);
+    setSelectedOption(null); // clear previous selection
+    setFeedback(""); // reset feedback message
+    setShowHint(false); // hide hint when moving on
+    if (retry) {
+      setRetry(false); // user opted to retry current step
+      return;
+    }
+    if (nextStep !== null && nextStep < scenario.steps.length) {
+      setCurrentStepIndex(nextStep); // jump to branched step
+    } else if (currentStepIndex + 1 < scenario.steps.length) {
+      setCurrentStepIndex((prev) => prev + 1); // proceed sequentially
     } else {
-      setCompleted(true);
+      setCompleted(true); // simulation finished
       setAnalytics((prev) => ({ ...prev, endTime: Date.now() }));
     }
   };
@@ -226,14 +267,24 @@ const Simulation = () => {
                   Correct: {analytics.correct} | Incorrect: {analytics.incorrect}
                 </p>
                 {simulationId && (
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     Simulation ID: {simulationId}
-                  </p>
+                  </p> {/* corrected attribute name */}
                 )}
 
+                {Object.keys(mitreScores).length > 0 && (
+                  <div className="text-left mt-4">
+                    {/* display counts per MITRE technique */}
+                    <h4 className="font-semibold">MITRE ATT&CK Score</h4>
+                    <ul className="text-sm">
+                      {Object.entries(mitreScores).map(([tech, val]) => (
+                        <li key={tech}>{tech}: {val}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
-
-              <TimelineViewer timeline={timeline} />
+                <TimelineViewer timeline={timeline} />
               </div>
             ) : (
               <div className="bg-white dark:bg-gray-800 p-6 rounded shadow space-y-4">
@@ -250,10 +301,21 @@ const Simulation = () => {
                         ${selectedOption === index ? "bg-blue-100 dark:bg-blue-700" : "bg-gray-50 dark:bg-gray-900"}
                       hover:bg-gray-200 dark:hover:bg-gray-700`}
                     >
-                      {option}
+                      {option.text || option} {/* render option text whether string or object */}
                     </button>
                   ))}
                 </div>
+                {step.hint && !feedback && (
+                  <button
+                    className="mt-2 text-sm text-blue-600"
+                    onClick={() => setShowHint(!showHint)}
+                  >
+                    {showHint ? "Hide Hint" : "Show Hint"} {/* hint toggle */}
+                  </button>
+                )}
+                {showHint && step.hint && (
+                  <p className="mt-2 italic text-sm">{step.hint}</p> /* show hint text */
+                )}
 
                 {feedback && (
                   <>
@@ -263,7 +325,7 @@ const Simulation = () => {
                         onClick={handleNextStep}
                         className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                       >
-                        Next
+                        {retry ? "Retry" : "Next"} {/* show Retry when option allowed */}
                       </button>
                     </div>
                   </>
