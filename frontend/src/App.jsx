@@ -54,7 +54,7 @@ const App = () => {
       <AuthProvider>
         <Router>
           <Routes>
-            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/" element={<SecureRoute><RoleBasedRedirect /></SecureRoute>} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/redirect" element={<SecureRoute><RoleBasedRedirect /></SecureRoute>} />
