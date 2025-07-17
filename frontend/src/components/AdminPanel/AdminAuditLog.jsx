@@ -49,15 +49,30 @@ const AdminAuditLog = () => {
       ) : logs.length === 0 ? (
         <p>No audit logs found.</p>
       ) : (
-        <ul className="space-y-2">
-          {logs.map((log, index) => (
-            // Display a single audit record
-            <li key={index} className="border dark:border-gray-600 p-2 rounded">
-              <p>{log.action}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{new Date(log.timestamp).toLocaleString()}</p>
-            </li>
-          ))}
-        </ul>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse">
+            <thead className="bg-gray-100 dark:bg-gray-700">
+              <tr>
+                <th className="border dark:border-gray-600 px-4 py-2 text-left">Actor</th>
+                <th className="border dark:border-gray-600 px-4 py-2 text-left">Action</th>
+                <th className="border dark:border-gray-600 px-4 py-2 text-left">Details</th>
+                <th className="border dark:border-gray-600 px-4 py-2 text-left">Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs.map((log, index) => (
+                <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td className="border dark:border-gray-600 px-4 py-2">{log.actor ?? "-"}</td>
+                  <td className="border dark:border-gray-600 px-4 py-2 capitalize">{log.action}</td>
+                  <td className="border dark:border-gray-600 px-4 py-2">{log.details ?? "-"}</td>
+                  <td className="border dark:border-gray-600 px-4 py-2">
+                    {new Date(log.timestamp).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
