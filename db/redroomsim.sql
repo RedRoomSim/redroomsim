@@ -39,3 +39,12 @@ CREATE TABLE redroomsimdb.simulation_step_progress (
     time_ms INTEGER,
     created_at TIMESTAMP DEFAULT now()
 );
+
+-- Stores high-level audit information for administrator actions
+CREATE TABLE redroomsimdb.audit_logs (
+    id SERIAL PRIMARY KEY, -- unique audit entry ID
+    actor VARCHAR(255), -- user performing the action
+    action TEXT NOT NULL, -- description of what happened
+    details TEXT, -- optional additional context
+    timestamp TIMESTAMPTZ DEFAULT now() -- time of the event
+);
