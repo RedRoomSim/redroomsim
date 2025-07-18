@@ -17,12 +17,64 @@ Changelog:
 // Import necessary Firebase modules
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { saveAs } from "file-saver";
 
 const AdminAuditLog = () => {
   // Store logs returned from the API
   const [logs, setLogs] = useState([]);
   // Loading flag for conditional rendering
   const [loading, setLoading] = useState(true);
+  // Filter fields
+  const [filters, setFilters] = useState({
+    actor: "",
+    action: "",
+    details: "",
+    startDate: "",
+    endDate: "",
+  });
+
+  const handleFilterChange = (e) => {
+    setFilters({ ...filters, [e.target.name]: e.target.value });
+  };
+  
+    const filteredLogs = logs.filter((log) => {
+    const actorMatch = log.actor
+      ? log.actor.toLowerCase().includes(filters.actor.toLowerCase())
+      : filters.actor === "";
+    const actionMatch = log.action
+      .toLowerCase()
+      .includes(filters.action.toLowerCase());
+    const detailsMatch = log.details
+      ? log.details.toLowerCase().includes(filters.details.toLowerCase())
+      : filters.details === "";
+    const startMatch = filters.startDate
+      ? new Date(log.timestamp) >= new Date(filters.startDate)
+      : true;
+    const endMatch = filters.endDate
+      ? new Date(log.timestamp) <= new Date(filters.endDate)
+      : true;
+    return actorMatch && actionMatch && detailsMatch && startMatch && endMatch;
+  });
+
+  const downloadExcel = async () => {
+    if (!filters.startDate || !filters.endDate) return;
+    try {
+      const res = await axios.get(
+        "https://api.redroomsim.com/audit/export",
+        {
+          params: {
+            start_date: filters.startDate,
+            end_date: filters.endDate,
+          },
+          responseType: "blob",
+        },
+      );
+      saveAs(res.data, "audit_logs.xlsx");
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to download logs", err);
+    }
+  };
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -50,6 +102,53 @@ const AdminAuditLog = () => {
         <p>No audit logs found.</p>
       ) : (
         <div className="overflow-x-auto">
+           <div className="mb-4 flex flex-wrap gap-2">
+            <input
+              type="text"
+              name="actor"
+              placeholder="Filter actor"
+              value={filters.actor}
+              onChange={handleFilterChange}
+              className="border px-2 py-1 rounded"
+            />
+            <input
+              type="text"
+              name="action"
+              placeholder="Filter action"
+              value={filters.action}
+              onChange={handleFilterChange}
+              className="border px-2 py-1 rounded"
+            />
+            <input
+              type="text"
+              name="details"
+              placeholder="Filter details"
+              value={filters.details}
+              onChange={handleFilterChange}
+              className="border px-2 py-1 rounded"
+            />
+            <input
+              type="date"
+              name="startDate"
+              value={filters.startDate}
+              onChange={handleFilterChange}
+              className="border px-2 py-1 rounded"
+            />
+            <input
+              type="date"
+              name="endDate"
+              value={filters.endDate}
+              onChange={handleFilterChange}
+              className="border px-2 py-1 rounded"
+            />
+            <button
+              type="button"
+              onClick={downloadExcel}
+              className="bg-blue-500 text-white px-3 py-1 rounded"
+            >
+              Download
+            </button>
+          </div>
           <table className="min-w-full border-collapse">
             <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
@@ -60,7 +159,7 @@ const AdminAuditLog = () => {
               </tr>
             </thead>
             <tbody>
-              {logs.map((log, index) => (
+              {filteredLogs.map((log, index) => (
                 <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="border dark:border-gray-600 px-4 py-2">{log.actor ?? "-"}</td>
                   <td className="border dark:border-gray-600 px-4 py-2 capitalize">{log.action}</td>
