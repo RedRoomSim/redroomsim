@@ -10,6 +10,7 @@ from sqlalchemy import (
 )
 from db import Base
 
+
 class SimulationProgress(Base):
     __tablename__ = "simulation_progress"
     __table_args__ = (
@@ -42,5 +43,5 @@ class SimulationStepProgress(Base):
     decision = Column(String, nullable=False)
     feedback = Column(String)
     time_ms = Column(Integer)
+    sequence = Column(Integer, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-
