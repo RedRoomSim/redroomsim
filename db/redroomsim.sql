@@ -38,6 +38,7 @@ CREATE TABLE redroomsimdb.simulation_step_progress (
     decision TEXT NOT NULL,
     feedback TEXT,
     time_ms INTEGER,
+    sequence INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT now()
 );
 

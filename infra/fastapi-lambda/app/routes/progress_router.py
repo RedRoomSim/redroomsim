@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import func
 from db import SessionLocal
 from models.progress_models import SimulationProgress, SimulationStepProgress
 from pydantic import BaseModel
 import uuid
 
 progress_router = APIRouter()
+
 
 class ProgressIn(BaseModel):
     scenario_id: str
@@ -23,12 +25,17 @@ class StepProgressIn(BaseModel):
     feedback: str | None = None
     time_ms: int | None = None
 
+
 @progress_router.post("/save")
 def save_progress(progress: ProgressIn):
     db = SessionLocal()
     try:
         if progress.sim_uuid:
-            record = db.query(SimulationProgress).filter_by(sim_uuid=progress.sim_uuid).first()
+            record = (
+                db.query(SimulationProgress)
+                .filter_by(sim_uuid=progress.sim_uuid)
+                .first()
+            )
             if not record:
                 raise HTTPException(status_code=404, detail="Simulation not found")
             record.score = progress.score
@@ -73,12 +80,19 @@ def save_progress(progress: ProgressIn):
 def save_step_progress(step: StepProgressIn):
     db = SessionLocal()
     try:
+        last_sequence = (
+            db.query(func.max(SimulationStepProgress.sequence))
+            .filter_by(sim_uuid=step.sim_uuid)
+            .scalar()
+        )
+        next_sequence = (last_sequence or 0) + 1
         record = SimulationStepProgress(
             sim_uuid=step.sim_uuid,
             step_index=step.step_index,
             decision=step.decision,
             feedback=step.feedback,
             time_ms=step.time_ms,
+            sequence=next_sequence,
         )
         db.add(record)
         db.commit()
@@ -89,6 +103,7 @@ def save_step_progress(step: StepProgressIn):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
+
 
 @progress_router.get("/{username}/{simulation_id}")
 def get_progress(username: str, simulation_id: str):
@@ -122,7 +137,7 @@ def get_timeline(simulation_id: str):
         records = (
             db.query(SimulationStepProgress)
             .filter_by(sim_uuid=simulation_id)
-            .order_by(SimulationStepProgress.step_index)
+            .order_by(SimulationStepProgress.sequence)
             .all()
         )
         return [
@@ -144,11 +159,7 @@ def get_timeline(simulation_id: str):
 def get_user_progress(username: str):
     db = SessionLocal()
     try:
-        records = (
-            db.query(SimulationProgress)
-            .filter_by(username=username)
-            .all()
-        )
+        records = db.query(SimulationProgress).filter_by(username=username).all()
         return [
             {
                 "id": r.id,
@@ -163,4 +174,3 @@ def get_user_progress(username: str):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
-
