@@ -37,16 +37,28 @@ def save_progress(progress: ProgressIn):
             db.refresh(record)
             return {"simulation_id": record.sim_uuid}
         else:
-            sim_uuid = str(uuid.uuid4())
-            record = SimulationProgress(
-                sim_uuid=sim_uuid,
-                scenario_id=progress.scenario_id,
-                name=progress.name,
-                username=progress.username,
-                score=progress.score,
-                completed=progress.completed,
+            existing = (
+                db.query(SimulationProgress)
+                .filter_by(username=progress.username, scenario_id=progress.scenario_id)
+                .first()
             )
-            db.add(record)
+            sim_uuid = str(uuid.uuid4())
+            if existing:
+                existing.sim_uuid = sim_uuid
+                existing.name = progress.name
+                existing.score = progress.score
+                existing.completed = progress.completed
+                record = existing
+            else:
+                record = SimulationProgress(
+                    sim_uuid=sim_uuid,
+                    scenario_id=progress.scenario_id,
+                    name=progress.name,
+                    username=progress.username,
+                    score=progress.score,
+                    completed=progress.completed,
+                )
+                db.add(record)
             db.commit()
             db.refresh(record)
             return {"simulation_id": sim_uuid}
