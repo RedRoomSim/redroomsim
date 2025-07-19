@@ -30,7 +30,8 @@ async def audit_middleware(request: Request, call_next):
     try:
         actor = request.headers.get("x-user")  # optional user performing the request
         action = f"{request.method} {request.url.path}"  # summarize the action
-        record_audit_event(actor=actor, action=action)
+        screen = request.headers.get("x-screen") or request.headers.get("referer")
+        record_audit_event(actor=actor, action=action, screen=screen)
     except Exception:
         # Never interrupt a request if audit logging fails
         pass

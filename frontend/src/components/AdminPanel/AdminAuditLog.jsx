@@ -29,6 +29,7 @@ const AdminAuditLog = () => {
     actor: "",
     action: "",
     details: "",
+    screen: "",
     startDate: "",
     endDate: "",
   });
@@ -47,13 +48,23 @@ const AdminAuditLog = () => {
     const detailsMatch = log.details
       ? log.details.toLowerCase().includes(filters.details.toLowerCase())
       : filters.details === "";
+    const screenMatch = log.screen
+      ? log.screen.toLowerCase().includes(filters.screen.toLowerCase())
+      : filters.screen === "";
     const startMatch = filters.startDate
       ? new Date(log.timestamp) >= new Date(filters.startDate)
       : true;
     const endMatch = filters.endDate
       ? new Date(log.timestamp) <= new Date(filters.endDate)
       : true;
-    return actorMatch && actionMatch && detailsMatch && startMatch && endMatch;
+    return (
+      actorMatch &&
+      actionMatch &&
+      detailsMatch &&
+      screenMatch &&
+      startMatch &&
+      endMatch
+    );
   });
 
   const downloadExcel = async () => {
@@ -128,6 +139,14 @@ const AdminAuditLog = () => {
               className="border px-2 py-1 rounded"
             />
             <input
+              type="text"
+              name="screen"
+              placeholder="Filter screen"
+              value={filters.screen}
+              onChange={handleFilterChange}
+              className="border px-2 py-1 rounded"
+            />
+            <input
               type="date"
               name="startDate"
               value={filters.startDate}
@@ -155,6 +174,7 @@ const AdminAuditLog = () => {
                 <th className="border dark:border-gray-600 px-4 py-2 text-left">Actor</th>
                 <th className="border dark:border-gray-600 px-4 py-2 text-left">Action</th>
                 <th className="border dark:border-gray-600 px-4 py-2 text-left">Details</th>
+                <th className="border dark:border-gray-600 px-4 py-2 text-left">Screen</th>
                 <th className="border dark:border-gray-600 px-4 py-2 text-left">Timestamp</th>
               </tr>
             </thead>
@@ -164,6 +184,7 @@ const AdminAuditLog = () => {
                   <td className="border dark:border-gray-600 px-4 py-2">{log.actor ?? "-"}</td>
                   <td className="border dark:border-gray-600 px-4 py-2 capitalize">{log.action}</td>
                   <td className="border dark:border-gray-600 px-4 py-2">{log.details ?? "-"}</td>
+                  <td className="border dark:border-gray-600 px-4 py-2">{log.screen ?? "-"}</td>
                   <td className="border dark:border-gray-600 px-4 py-2">
                     {new Date(log.timestamp).toLocaleString()}
                   </td>

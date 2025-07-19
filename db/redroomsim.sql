@@ -48,5 +48,6 @@ CREATE TABLE redroomsimdb.audit_logs (
     actor VARCHAR(255), -- user performing the action
     action TEXT NOT NULL, -- description of what happened
     details TEXT, -- optional additional context
+    screen TEXT, -- UI screen or page initiating the event
     timestamp TIMESTAMPTZ DEFAULT now() -- time of the event
 );
