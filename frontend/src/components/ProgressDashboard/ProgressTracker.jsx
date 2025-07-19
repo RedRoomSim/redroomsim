@@ -33,7 +33,9 @@ const ProgressTracker = () => {
       return;
     }
     try {
-      const res = await axios.get(`https://api.redroomsim.com/progress/timeline/${simId}`);
+      const res = await axios.get(
+        `https://api.redroomsim.com/progress/timeline/${simId}`
+      );
       setTimelines((prev) => ({ ...prev, [simId]: res.data }));
     } catch (err) {
       console.error("Failed to fetch timeline", err);
@@ -43,14 +45,11 @@ const ProgressTracker = () => {
   useEffect(() => {
     const fetchProgress = async () => {
       if (!user) return;
-      const ids = JSON.parse(localStorage.getItem("simulationIds") || "[]");
       try {
-        const responses = await Promise.all(
-          ids.map((id) =>
-            axios.get(`https://api.redroomsim.com/progress/${user.email}/${id}`)
-          )
+        const res = await axios.get(
+          `https://api.redroomsim.com/progress/user/${user.email}`
         );
-        setData(responses.map((r) => r.data));
+        setData(res.data);
       } catch (err) {
         console.error("Failed to fetch progress", err);
       }
@@ -74,23 +73,23 @@ const ProgressTracker = () => {
         </thead>
         <tbody>
           {data.map((entry) => (
-            <React.Fragment key={entry.simulation_id}>
+            <React.Fragment key={entry.sim_uuid}>
             <tr className="border-b border-gray-200 dark:border-gray-700">
-              <td className="py-3 px-6">{entry.name}</td>
+              <td className="py-3 px-6">{entry.scenario_id}</td>
               <td className="py-3 px-6">{entry.score ?? "-"}</td>
               <td className={`py-3 px-6 font-semibold ${entry.completed ? "text-green-600" : "text-red-600"}`}>
                 {entry.completed ? "Completed" : "Incomplete"}
               </td>
               <td className="py-3 px-6">
-                <button onClick={() => toggleTimeline(entry.simulation_id)} className="text-blue-600 dark:text-blue-400 underline">
-                  {timelines[entry.simulation_id] ? "Hide" : "Timeline"}
+                <button onClick={() => toggleTimeline(entry.sim_uuid)} className="text-blue-600 dark:text-blue-400 underline">
+                  {timelines[entry.sim_uuid] ? "Hide" : "Timeline"}
                 </button>
               </td>
             </tr>
-            {timelines[entry.simulation_id] && (
+            {timelines[entry.sim_uuid] && (
               <tr>
                 <td colSpan="4" className="py-3 px-6">
-                  <TimelineViewer timeline={timelines[entry.simulation_id]} />
+                  <TimelineViewer timeline={timelines[entry.sim_uuid]} />
                 </td>
               </tr>
             )}

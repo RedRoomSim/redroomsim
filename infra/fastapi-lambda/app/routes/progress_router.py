@@ -127,3 +127,28 @@ def get_timeline(simulation_id: str):
     finally:
         db.close()
 
+
+@progress_router.get("/user/{username}")
+def get_user_progress(username: str):
+    db = SessionLocal()
+    try:
+        records = (
+            db.query(SimulationProgress)
+            .filter_by(username=username)
+            .all()
+        )
+        return [
+            {
+                "id": r.id,
+                "scenario_id": r.scenario_id,
+                "score": r.score,
+                "completed": r.completed,
+                "sim_uuid": r.sim_uuid,
+            }
+            for r in records
+        ]
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()
+
