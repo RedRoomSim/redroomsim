@@ -18,7 +18,7 @@ Changelog:
 */
 
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import ScoringBar from "../components/SimulationEngine/ScoringBar";
 import TimelineViewer from "../components/SimulationEngine/TimelineViewer";
@@ -26,8 +26,11 @@ import { useAuth } from "../context/AuthContext";
 
 const Simulation = () => {
   const { scenarioId } = useParams();
+  const [searchParams] = useSearchParams();
+  const initialStep = parseInt(searchParams.get("step")) || 0;
+  const initialSimId = searchParams.get("simId");
   const [scenario, setScenario] = useState(null);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(initialStep);
   const [selectedOption, setSelectedOption] = useState(null);
   const [feedback, setFeedback] = useState("");
   const [score, setScore] = useState(0);
@@ -37,7 +40,7 @@ const Simulation = () => {
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [lastStepTimestamp, setLastStepTimestamp] = useState(null);
-  const [simulationId, setSimulationId] = useState(null);
+  const [simulationId, setSimulationId] = useState(initialSimId || null);
   const [endedEarly, setEndedEarly] = useState(false);
   const [showHint, setShowHint] = useState(false); // toggle visibility of hints
   const [nextStep, setNextStep] = useState(null); // store id of next step when branching
