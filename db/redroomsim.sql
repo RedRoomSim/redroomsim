@@ -27,7 +27,8 @@ CREATE TABLE redroomsimdb.simulation_progress (
     username TEXT NOT NULL,
     score INTEGER,
     completed BOOLEAN,
-    created_at TIMESTAMP DEFAULT now()
+    created_at TIMESTAMP DEFAULT now(),
+    UNIQUE (username, scenario_id)
 );
 
 CREATE TABLE redroomsimdb.simulation_step_progress (
