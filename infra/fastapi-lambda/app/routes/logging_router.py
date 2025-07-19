@@ -21,7 +21,8 @@ async def log_user_login(request: Request):
         db.add(log_entry)
         db.commit()
         # Record this login in the audit log
-        record_audit_event(actor=data["email"], action="login")
+        screen = request.headers.get("x-screen") or request.headers.get("referer")
+        record_audit_event(actor=data["email"], action="login", screen=screen)
         return {"message": "Login logged"}
     except Exception as e:
         db.rollback()
@@ -43,7 +44,8 @@ async def log_logout(request: Request):
         db.add(log)
         db.commit()
         # Capture logouts as part of the audit trail
-        record_audit_event(actor=data["email"], action="logout")
+        screen = request.headers.get("x-screen") or request.headers.get("referer")
+        record_audit_event(actor=data["email"], action="logout", screen=screen)
         return {"message": "Logout logged"}
     except Exception as e:
         db.rollback()
@@ -67,7 +69,8 @@ async def log_failed_login(request: Request):
         db.add(log_entry)
         db.commit()
         # Track failed attempts to help with security reviews
-        record_audit_event(actor=data.get("email"), action="failed_login")
+        screen = request.headers.get("x-screen") or request.headers.get("referer")
+        record_audit_event(actor=data.get("email"), action="failed_login", screen=screen)
         return {"message": "Failed login logged"}
     except Exception as e:
         db.rollback()
@@ -89,7 +92,8 @@ async def log_password_change(request: Request):
         db.add(log)
         db.commit()
         # Log any password changes
-        record_audit_event(actor=data["email"], action="password_change")
+        screen = request.headers.get("x-screen") or request.headers.get("referer")
+        record_audit_event(actor=data["email"], action="password_change", screen=screen)
         return {"message": "Password change logged"}
     except Exception as e:
         db.rollback()
@@ -103,7 +107,7 @@ def get_login_activity():
     try:
         logs = db.query(UserLoginLog).order_by(UserLoginLog.timestamp.desc()).all()
         # Viewing the login history is itself auditable
-        record_audit_event(actor=None, action="get_login_activity")
+        record_audit_event(actor=None, action="get_login_activity", screen=None)
         return [
             {
                 "email": log.email,

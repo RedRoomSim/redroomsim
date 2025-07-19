@@ -22,4 +22,5 @@ class AuditLog(Base):
     actor = Column(String)  # optional user email or identifier
     action = Column(String, nullable=False)  # short description
     details = Column(String)  # any extra details
+    screen = Column(String)  # originating UI screen or page
     timestamp = Column(DateTime(timezone=True), server_default=func.now())

@@ -15,13 +15,14 @@ class AuditIn(BaseModel):
     actor: str | None = None
     action: str
     details: str | None = None
+    screen: str | None = None
 
 @router.post("/log")
 async def create_audit_log(audit: AuditIn):
     """Persist a new audit event."""
     db = SessionLocal()
     try:
-        record = AuditLog(actor=audit.actor, action=audit.action, details=audit.details)
+        record = AuditLog(actor=audit.actor, action=audit.action, details=audit.details, screen=audit.screen)
         db.add(record)
         db.commit()
         db.refresh(record)
@@ -37,6 +38,7 @@ def get_audit_logs(
     actor: str | None = None,
     action: str | None = None,
     details: str | None = None,
+    screen: str | None = None,
     start_date: str | None = None,
     end_date: str | None = None,
 ):
@@ -50,6 +52,8 @@ def get_audit_logs(
             query = query.filter(AuditLog.action.ilike(f"%{action}%"))
         if details:
             query = query.filter(AuditLog.details.ilike(f"%{details}%"))
+        if screen:
+            query = query.filter(AuditLog.screen.ilike(f"%{screen}%"))
         if start_date:
             start_dt = datetime.fromisoformat(start_date)
             query = query.filter(AuditLog.timestamp >= start_dt)
@@ -62,6 +66,7 @@ def get_audit_logs(
                 "actor": log.actor,
                 "action": log.action,
                 "details": log.details,
+                "screen": log.screen,
                 "timestamp": log.timestamp.isoformat(),
             }
             for log in logs
@@ -88,12 +93,13 @@ def export_audit_logs(start_date: str, end_date: str):
 
         wb = Workbook()
         ws = wb.active
-        ws.append(["Actor", "Action", "Details", "Timestamp"])
+        ws.append(["Actor", "Action", "Details", "Screen", "Timestamp"])
         for log in logs:
             ws.append([
                 log.actor,
                 log.action,
                 log.details,
+                log.screen,
                 log.timestamp.isoformat(),
             ])
 
