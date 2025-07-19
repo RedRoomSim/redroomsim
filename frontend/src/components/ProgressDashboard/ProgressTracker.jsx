@@ -19,6 +19,7 @@ Changelog:
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import TimelineViewer from "../SimulationEngine/TimelineViewer";
 
@@ -26,6 +27,7 @@ const ProgressTracker = () => {
   const [data, setData] = useState([]);
   const [timelines, setTimelines] = useState({});
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const toggleTimeline = async (simId) => {
     if (timelines[simId]) {
@@ -39,6 +41,20 @@ const ProgressTracker = () => {
       setTimelines((prev) => ({ ...prev, [simId]: res.data }));
     } catch (err) {
       console.error("Failed to fetch timeline", err);
+    }
+  };
+
+  const handleResume = async (entry) => {
+    try {
+      const res = await axios.get(
+        `https://api.redroomsim.com/progress/timeline/${entry.sim_uuid}`
+      );
+      const nextStep = Array.isArray(res.data) ? res.data.length : 0;
+      navigate(
+        `/simulation/${entry.scenario_id}?simId=${entry.sim_uuid}&step=${nextStep}`
+      );
+    } catch (err) {
+      console.error("Failed to resume simulation", err);
     }
   };
 
@@ -69,6 +85,7 @@ const ProgressTracker = () => {
             <th className="py-3 px-6 text-left">Score</th>
             <th className="py-3 px-6 text-left">Status</th>
             <th className="py-3 px-6 text-left">Timeline</th>
+            <th className="py-3 px-6 text-left">Resume</th>
           </tr>
         </thead>
         <tbody>
@@ -85,10 +102,20 @@ const ProgressTracker = () => {
                   {timelines[entry.sim_uuid] ? "Hide" : "Timeline"}
                 </button>
               </td>
+              <td className="py-3 px-6">
+                {!entry.completed && (
+                  <button
+                    onClick={() => handleResume(entry)}
+                    className="text-blue-600 dark:text-blue-400 underline"
+                  >
+                    Resume
+                  </button>
+                )}
+              </td>
             </tr>
             {timelines[entry.sim_uuid] && (
               <tr>
-                <td colSpan="4" className="py-3 px-6">
+                <td colSpan="5" className="py-3 px-6">
                   <TimelineViewer timeline={timelines[entry.sim_uuid]} />
                 </td>
               </tr>
