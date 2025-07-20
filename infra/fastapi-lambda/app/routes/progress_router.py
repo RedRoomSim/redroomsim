@@ -105,7 +105,8 @@ def save_step_progress(step: StepProgressIn):
         db.close()
 
 
-@progress_router.get("/{username}/{simulation_id}")
+# Retrieve a specific progress record for a user and simulation
+@progress_router.get("/detail/{username}/{simulation_id}")
 def get_progress(username: str, simulation_id: str):
     db = SessionLocal()
     try:
