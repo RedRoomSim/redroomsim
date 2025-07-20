@@ -20,17 +20,27 @@ Changelog:
 import React from "react";
 
 const TimelineViewer = ({ timeline }) => {
+  const entries = Array.isArray(timeline)
+    ? timeline
+    : Array.isArray(timeline?.timeline)
+    ? timeline.timeline
+    : [];
+
   return (
     <div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-xl shadow">
       <h3 className="text-lg font-bold mb-3">Decision Timeline</h3>
       <ul className="space-y-2">
-        {timeline.map((entry, idx) => (
+        {entries.map((entry, idx) => (
           <li
             key={idx}
             className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-gray-50 dark:bg-gray-700"
           >
-            <p><b>Decision:</b> {entry.decision}</p>
-            <p><b>Feedback:</b> {entry.feedback}</p>
+            <p>
+              <b>Decision:</b> {entry.decision}
+            </p>
+            <p>
+              <b>Feedback:</b> {entry.feedback}
+            </p>
             {/*<p className="text-sm text-gray-500 mt-1">⏱️ Time: {(entry.timeMs / 1000).toFixed(2)} seconds</p>*/}
           </li>
         ))}

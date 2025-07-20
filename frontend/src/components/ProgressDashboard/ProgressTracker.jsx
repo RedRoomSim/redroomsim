@@ -26,6 +26,7 @@ import TimelineViewer from "../SimulationEngine/TimelineViewer";
 const ProgressTracker = () => {
   const [data, setData] = useState([]);
   const [timelines, setTimelines] = useState({});
+  const [availableScenarios, setAvailableScenarios] = useState([]);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -46,6 +47,8 @@ const ProgressTracker = () => {
 
   const handleResume = async (entry) => {
     try {
+      const scenarioExists = availableScenarios.includes(entry.scenario_id);
+      if (!scenarioExists) return;
       const res = await axios.get(
         `https://api.redroomsim.com/progress/timeline/${entry.sim_uuid}`
       );
@@ -72,6 +75,19 @@ const ProgressTracker = () => {
     };
     fetchProgress();
   }, [user]);
+
+  useEffect(() => {
+    const fetchScenarios = async () => {
+      try {
+        const res = await axios.get("https://api.redroomsim.com/sim/list");
+        const ids = res.data?.scenarios?.map((s) => s.id) || [];
+        setAvailableScenarios(ids);
+      } catch (err) {
+        console.error("Failed to fetch scenario list", err);
+      }
+    };
+    fetchScenarios();
+  }, []);
 
   return (
     <div className="p-4 sm:p-6">
@@ -103,13 +119,15 @@ const ProgressTracker = () => {
                 </button>
               </td>
               <td className="py-3 px-6">
-                {!entry.completed && (
+                {!entry.completed && availableScenarios.includes(entry.scenario_id) ? (
                   <button
                     onClick={() => handleResume(entry)}
                     className="text-blue-600 dark:text-blue-400 underline"
                   >
                     Resume
                   </button>
+                ) : (
+                  <span className="text-gray-400">N/A</span>
                 )}
               </td>
             </tr>
