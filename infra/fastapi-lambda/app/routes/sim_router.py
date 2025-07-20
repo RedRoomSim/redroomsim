@@ -85,6 +85,25 @@ async def upload_scenario(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
 
+@sim_router.delete("/delete-scenario/{scenario_id}")
+def delete_scenario(scenario_id: str):
+    """Delete a scenario JSON file from the S3 bucket by scenario id or filename."""
+    try:
+        response = s3_client.list_objects_v2(Bucket=BUCKET_NAME)
+        for obj in response.get("Contents", []):
+            key = obj["Key"]
+            if not key.endswith(".json"):
+                continue
+            file_obj = s3_client.get_object(Bucket=BUCKET_NAME, Key=key)
+            data = json.loads(file_obj["Body"].read().decode("utf-8"))
+            if data.get("scenario_id") == scenario_id or os.path.splitext(key)[0] == scenario_id:
+                s3_client.delete_object(Bucket=BUCKET_NAME, Key=key)
+                return {"status": "deleted"}
+        raise HTTPException(status_code=404, detail="Scenario not found")
+    except (BotoCoreError, ClientError, Exception) as e:
+        raise HTTPException(status_code=500, detail=f"Delete failed: {str(e)}")
+
+
     
 
 

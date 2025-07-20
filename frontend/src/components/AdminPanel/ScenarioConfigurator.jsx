@@ -14,13 +14,77 @@ Changelog:
  - Placeholder content for future scenario configuration features.
 */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const ScenarioConfigurator = () => {
+  const [scenarios, setScenarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchScenarios = async () => {
+    try {
+      const res = await axios.get("https://api.redroomsim.com/sim/list");
+      setScenarios(res.data.scenarios || []);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to fetch scenarios", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchScenarios();
+  }, []);
+
+  const deleteScenario = async (id) => {
+    try {
+      await axios.delete(
+        `https://api.redroomsim.com/sim/delete-scenario/${id}`
+      );
+      setScenarios((prev) => prev.filter((s) => s.id !== id));
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Failed to delete scenario", err);
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 dark:text-white rounded-xl shadow p-6">
       <h2 className="text-xl font-bold mb-4">Scenario Configurator</h2>
-      <p className="text-gray-700 dark:text-gray-300">Here you will configure scenarios (coming soon).</p>
+      {loading ? (
+        <p>Loading...</p>
+      ) : scenarios.length === 0 ? (
+        <p className="text-gray-700 dark:text-gray-300">No scenarios found.</p>
+      ) : (
+        <table className="min-w-full border-collapse text-gray-900 dark:text-white">
+          <thead className="bg-gray-100 dark:bg-gray-700">
+            <tr>
+              <th className="border dark:border-gray-600 px-4 py-2 text-left">Name</th>
+              <th className="border dark:border-gray-600 px-4 py-2 text-left">Type</th>
+              <th className="border dark:border-gray-600 px-4 py-2 text-left">Difficulty</th>
+              <th className="border dark:border-gray-600 px-4 py-2" />
+            </tr>
+          </thead>
+          <tbody>
+            {scenarios.map((sc) => (
+              <tr key={sc.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <td className="border dark:border-gray-600 px-4 py-2">{sc.name}</td>
+                <td className="border dark:border-gray-600 px-4 py-2">{sc.type}</td>
+                <td className="border dark:border-gray-600 px-4 py-2">{sc.difficulty}</td>
+                <td className="border dark:border-gray-600 px-4 py-2 text-center">
+                  <button
+                    onClick={() => deleteScenario(sc.id)}
+                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };
