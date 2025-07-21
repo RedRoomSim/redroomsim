@@ -22,6 +22,7 @@ Changelog:
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
+import ResponsiveContainer from "../Shared/ResponsiveContainer";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../../firebase/firebaseConfig";
@@ -84,7 +85,8 @@ const RegisterForm = () => {
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-900">
-      <form onSubmit={handleRegister} className="bg-white dark:bg-gray-800 p-8 rounded shadow-md w-96 space-y-4">
+      <ResponsiveContainer>
+      <form onSubmit={handleRegister} className="bg-white dark:bg-gray-800 p-8 rounded shadow-md w-full sm:w-96 space-y-4">
         <div className="flex justify-center mb-4">
           <img src={logo} alt="Red Room Simulation" className="h-16 w-16" />
         </div>
@@ -153,6 +155,7 @@ const RegisterForm = () => {
           </span>
         </div>
       </form>
+      </ResponsiveContainer>
     </div>
   );
 };

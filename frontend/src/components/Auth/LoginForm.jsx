@@ -28,6 +28,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import logo from "../../assets/logo.png";
+import ResponsiveContainer from "../Shared/ResponsiveContainer";
 
 const LoginForm = () => {
   const [username, setUsername] = useState("");
@@ -54,10 +55,11 @@ const LoginForm = () => {
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-8 rounded shadow-md w-96 space-y-4">
-        <div className="flex justify-center mb-4">
-          <img src={logo} alt="Red Room Simulation" className="h-16 w-16" />
-        </div>
+      <ResponsiveContainer>
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 p-8 rounded shadow-md w-full sm:w-96 space-y-4">
+          <div className="flex justify-center mb-4">
+            <img src={logo} alt="Red Room Simulation" className="h-16 w-16" />
+          </div>
 
         <h2 className="text-2xl font-bold text-center">Red Room Simulation</h2>
 
@@ -89,7 +91,8 @@ const LoginForm = () => {
             Register here
           </Link>
         </div>
-      </form>
+        </form>
+      </ResponsiveContainer>
     </div>
   );
 };

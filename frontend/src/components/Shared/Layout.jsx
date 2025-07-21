@@ -21,6 +21,7 @@ Changelog:
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
+import ResponsiveContainer from "./ResponsiveContainer";
 
 /**
 * Layout component wraps the main content with Sidebar and Topbar.  It manages the sidebar state and applies appropriate styles for responsiveness.
@@ -54,7 +55,9 @@ const Layout = ({ children }) => {
         <div className={`flex flex-col flex-1 ml-0 transition-all duration-300 ${sidebarOpen ? 'sm:ml-64' : 'sm:ml-20'}`}>
           <Topbar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
           <div className="flex-1 overflow-auto bg-white dark:bg-gray-900 p-6">
-            {children}
+            <ResponsiveContainer>
+              {children}
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
