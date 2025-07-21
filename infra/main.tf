@@ -292,7 +292,7 @@ module "apigateway" {
       "https://redroomsim.com",
       "https://www.redroomsim.com"
     ]
-    allow_methods = ["GET", "POST", "OPTIONS"]
+    allow_methods = ["GET", "POST", "OPTIONS", "DELETE"]
     allow_headers = ["Content-Type", "Authorization"]
     expose_headers = []
     max_age = 3600
