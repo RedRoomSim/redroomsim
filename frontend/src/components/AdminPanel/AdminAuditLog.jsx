@@ -93,6 +93,11 @@ const AdminAuditLog = () => {
   const indexOfFirstLog = indexOfLastLog - logsPerPage;
   const currentLogs = sortedLogs.slice(indexOfFirstLog, indexOfLastLog);
 
+  // Pagination helpers
+  const pageGroup = Math.floor((currentPage - 1) / 5);
+  const startPage = pageGroup * 5 + 1;
+  const endPage = Math.min(startPage + 4, totalPages);
+
   const downloadExcel = async () => {
     if (!filters.startDate || !filters.endDate) return;
     try {
@@ -306,17 +311,36 @@ const AdminAuditLog = () => {
           </table>
           {totalPages > 1 && (
             <div className="flex justify-center mt-4 gap-2">
-              {Array.from({ length: totalPages }, (_, i) => (
+              {startPage > 1 && (
                 <button
-                  key={i}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`px-3 py-1 rounded ${currentPage === i + 1
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 dark:bg-gray-700 dark:text-white"}`}
+                  onClick={() => setCurrentPage(startPage - 1)}
+                  className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 dark:text-white"
                 >
-                  {i + 1}
+                  {'<<'}
                 </button>
-              ))}
+              )}
+              {Array.from({ length: endPage - startPage + 1 }, (_, idx) => {
+                const pageNum = startPage + idx;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`px-3 py-1 rounded ${currentPage === pageNum
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 dark:bg-gray-700 dark:text-white"}`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              {endPage < totalPages && (
+                <button
+                  onClick={() => setCurrentPage(endPage + 1)}
+                  className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 dark:text-white"
+                >
+                  {'>>'}
+                </button>
+              )}
             </div>
           )}
         </div>
