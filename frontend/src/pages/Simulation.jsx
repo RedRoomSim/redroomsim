@@ -23,7 +23,6 @@ import axios from "axios";
 import ScoringBar from "../components/SimulationEngine/ScoringBar";
 import TimelineViewer from "../components/SimulationEngine/TimelineViewer";
 import { useAuth } from "../context/AuthContext";
-import { useDifficulty } from "../context/DifficultyContext";
 
 const Simulation = () => {
   const { scenarioId } = useParams();
@@ -49,7 +48,6 @@ const Simulation = () => {
   const [retry, setRetry] = useState(false); // flag to retry when option leads to null
   const [mitreScores, setMitreScores] = useState({}); // cumulative MITRE ATT&CK counts
   const { user } = useAuth();
-  const { difficulty } = useDifficulty();
 
   useEffect(() => {
     const fetchScenario = async () => {
@@ -117,10 +115,6 @@ const Simulation = () => {
     const stepFeedback = isCorrect
       ? "✅ Correct!"
       : `❌ Incorrect. The correct answer was: "${correctText}"`;
-
-    if (difficulty === "Medium" && !isCorrect) {
-      setShowHint(true);
-    }
 
     setScore((prev) => (isCorrect ? prev + 1 : prev));
     if (isCorrect && step.mitre_attack) {
@@ -314,25 +308,16 @@ const Simulation = () => {
                     </button>
                   ))}
                 </div>
-                {step.hint && difficulty === "Easy" && !feedback && (
+                {step.hint && !feedback && (
                   <button
                     className="mt-2 text-sm text-blue-600"
                     onClick={() => setShowHint(!showHint)}
                   >
-                    {showHint ? "Hide Hint" : "Show Hint"}
+                    {showHint ? "Hide Hint" : "Show Hint"} {/* hint toggle */}
                   </button>
                 )}
-                {step.hint && (
-                  <>
-                    {difficulty === "Easy" && showHint && (
-                      <p className="mt-2 italic text-sm">{step.hint}</p>
-                    )}
-                    {difficulty === "Medium" &&
-                      selectedOption !== null &&
-                      selectedOption !== step.correct_option && (
-                        <p className="mt-2 italic text-sm">{step.hint}</p>
-                      )}
-                  </>
+                {showHint && step.hint && (
+                  <p className="mt-2 italic text-sm">{step.hint}</p> /* show hint text */
                 )}
 
                 {feedback && (
