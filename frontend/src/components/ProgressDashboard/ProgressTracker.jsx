@@ -26,7 +26,7 @@ import TimelineViewer from "../SimulationEngine/TimelineViewer";
 const ProgressTracker = () => {
   const [data, setData] = useState([]);
   const [timelines, setTimelines] = useState({});
-  const [availableScenarios, setAvailableScenarios] = useState([]);
+  const [scenarioMap, setScenarioMap] = useState({});
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -47,7 +47,7 @@ const ProgressTracker = () => {
 
   const handleResume = async (entry) => {
     try {
-      const scenarioExists = availableScenarios.includes(entry.scenario_id);
+      const scenarioExists = Boolean(scenarioMap[entry.scenario_id]);
       if (!scenarioExists) return;
       const res = await axios.get(
         `https://api.redroomsim.com/progress/timeline/${entry.sim_uuid}`
@@ -80,8 +80,11 @@ const ProgressTracker = () => {
     const fetchScenarios = async () => {
       try {
         const res = await axios.get("https://api.redroomsim.com/sim/list");
-        const ids = res.data?.scenarios?.map((s) => s.id) || [];
-        setAvailableScenarios(ids);
+        const map = {};
+        res.data?.scenarios?.forEach((s) => {
+          map[s.id] = s.name;
+        });
+        setScenarioMap(map);
       } catch (err) {
         console.error("Failed to fetch scenario list", err);
       }
@@ -108,7 +111,7 @@ const ProgressTracker = () => {
           {data.map((entry) => (
             <React.Fragment key={entry.sim_uuid}>
             <tr className="border-b border-gray-200 dark:border-gray-700">
-              <td className="py-3 px-6">{entry.scenario_id}</td>
+              <td className="py-3 px-6">{entry.name || scenarioMap[entry.scenario_id] || entry.scenario_id}</td>
               <td className="py-3 px-6">{entry.score ?? "-"}</td>
               <td className={`py-3 px-6 font-semibold ${entry.completed ? "text-green-600" : "text-red-600"}`}>
                 {entry.completed ? "Completed" : "Incomplete"}
@@ -119,7 +122,7 @@ const ProgressTracker = () => {
                 </button>
               </td>
               <td className="py-3 px-6">
-                {!entry.completed && availableScenarios.includes(entry.scenario_id) ? (
+                {!entry.completed && scenarioMap[entry.scenario_id] ? (
                   <button
                     onClick={() => handleResume(entry)}
                     className="text-blue-600 dark:text-blue-400 underline"
