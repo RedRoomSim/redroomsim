@@ -16,14 +16,10 @@ Changelog:
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import useTableSortResize from "../../hooks/useTableSortResize";
 
 const ScenarioConfigurator = () => {
   const [scenarios, setScenarios] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const { sortConfig, handleSort, columnWidths, handleMouseDown, sortData } =
-    useTableSortResize({ name: 200, type: 150, difficulty: 120 });
 
   const fetchScenarios = async () => {
     try {
@@ -53,8 +49,6 @@ const ScenarioConfigurator = () => {
     }
   };
 
-  const sortedScenarios = sortData(scenarios);
-
   return (
     <div className="bg-white dark:bg-gray-800 dark:text-white rounded-xl shadow p-6">
       <h2 className="text-xl font-bold mb-4">Scenario Configurator</h2>
@@ -63,45 +57,21 @@ const ScenarioConfigurator = () => {
       ) : scenarios.length === 0 ? (
         <p className="text-gray-700 dark:text-gray-300">No scenarios found.</p>
       ) : (
-        <table className="min-w-full border-collapse table-fixed text-gray-900 dark:text-white">
+        <table className="min-w-full border-collapse text-gray-900 dark:text-white">
           <thead className="bg-gray-100 dark:bg-gray-700">
             <tr>
-              <th
-                style={{ width: columnWidths.name }}
-                className="border dark:border-gray-600 px-4 py-2 text-left"
-              >
-                <div className="flex items-center">
-                  <span className="cursor-pointer" onClick={() => handleSort('name')}>Name</span>
-                  <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('name', e)} />
-                </div>
-              </th>
-              <th
-                style={{ width: columnWidths.type }}
-                className="border dark:border-gray-600 px-4 py-2 text-left"
-              >
-                <div className="flex items-center">
-                  <span className="cursor-pointer" onClick={() => handleSort('type')}>Type</span>
-                  <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('type', e)} />
-                </div>
-              </th>
-              <th
-                style={{ width: columnWidths.difficulty }}
-                className="border dark:border-gray-600 px-4 py-2 text-left"
-              >
-                <div className="flex items-center">
-                  <span className="cursor-pointer" onClick={() => handleSort('difficulty')}>Difficulty</span>
-                  <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('difficulty', e)} />
-                </div>
-              </th>
+              <th className="border dark:border-gray-600 px-4 py-2 text-left">Name</th>
+              <th className="border dark:border-gray-600 px-4 py-2 text-left">Type</th>
+              <th className="border dark:border-gray-600 px-4 py-2 text-left">Difficulty</th>
               <th className="border dark:border-gray-600 px-4 py-2" />
             </tr>
           </thead>
           <tbody>
-            {sortedScenarios.map((sc) => (
+            {scenarios.map((sc) => (
               <tr key={sc.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td style={{ width: columnWidths.name }} className="border dark:border-gray-600 px-4 py-2">{sc.name}</td>
-                <td style={{ width: columnWidths.type }} className="border dark:border-gray-600 px-4 py-2">{sc.type}</td>
-                <td style={{ width: columnWidths.difficulty }} className="border dark:border-gray-600 px-4 py-2">{sc.difficulty}</td>
+                <td className="border dark:border-gray-600 px-4 py-2">{sc.name}</td>
+                <td className="border dark:border-gray-600 px-4 py-2">{sc.type}</td>
+                <td className="border dark:border-gray-600 px-4 py-2">{sc.difficulty}</td>
                 <td className="border dark:border-gray-600 px-4 py-2 text-center">
                   <button
                     onClick={() => deleteScenario(sc.id)}

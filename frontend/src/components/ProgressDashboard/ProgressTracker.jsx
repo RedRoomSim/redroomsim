@@ -18,7 +18,6 @@ Changelog:
 
 
 import React, { useState, useEffect } from "react";
-import useTableSortResize from "../../hooks/useTableSortResize";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -30,15 +29,6 @@ const ProgressTracker = () => {
   const [scenarioMap, setScenarioMap] = useState({});
   const { user } = useAuth();
   const navigate = useNavigate();
-
-  const { sortConfig, handleSort, columnWidths, handleMouseDown, sortData } =
-    useTableSortResize({
-      name: 200,
-      score: 120,
-      status: 150,
-      timeline: 120,
-      resume: 120,
-    });
 
   const toggleTimeline = async (simId) => {
     if (timelines[simId]) {
@@ -102,63 +92,36 @@ const ProgressTracker = () => {
     fetchScenarios();
   }, []);
 
-  const sortedData = sortData(data);
-
   return (
     <div className="p-4 sm:p-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Progress Dashboard</h2>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-750 shadow-md rounded-lg overflow-hidden text-gray-900 dark:text-white table-fixed">
+        <table className="min-w-full bg-white dark:bg-gray-750 shadow-md rounded-lg overflow-hidden text-gray-900 dark:text-white">
         <thead className="bg-[#111827] text-white">
           <tr>
-            <th style={{ width: columnWidths.name }} className="py-3 px-6 text-left">
-              <div className="flex items-center">
-                <span className="cursor-pointer" onClick={() => handleSort('name')}>Scenario</span>
-                <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('name', e)} />
-              </div>
-            </th>
-            <th style={{ width: columnWidths.score }} className="py-3 px-6 text-left">
-              <div className="flex items-center">
-                <span className="cursor-pointer" onClick={() => handleSort('score')}>Score</span>
-                <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('score', e)} />
-              </div>
-            </th>
-            <th style={{ width: columnWidths.status }} className="py-3 px-6 text-left">
-              <div className="flex items-center">
-                <span className="cursor-pointer" onClick={() => handleSort('completed')}>Status</span>
-                <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('status', e)} />
-              </div>
-            </th>
-            <th style={{ width: columnWidths.timeline }} className="py-3 px-6 text-left">
-              <div className="flex items-center">
-                <span className="cursor-pointer" onClick={() => handleSort('timeline')}>Timeline</span>
-                <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('timeline', e)} />
-              </div>
-            </th>
-            <th style={{ width: columnWidths.resume }} className="py-3 px-6 text-left">
-              <div className="flex items-center">
-                <span className="cursor-pointer" onClick={() => handleSort('resume')}>Resume</span>
-                <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('resume', e)} />
-              </div>
-            </th>
+            <th className="py-3 px-6 text-left">Scenario</th>
+            <th className="py-3 px-6 text-left">Score</th>
+            <th className="py-3 px-6 text-left">Status</th>
+            <th className="py-3 px-6 text-left">Timeline</th>
+            <th className="py-3 px-6 text-left">Resume</th>
           </tr>
         </thead>
         <tbody>
-          {sortedData.map((entry) => (
+          {data.map((entry) => (
             <React.Fragment key={entry.sim_uuid}>
             <tr className="border-b border-gray-200 dark:border-gray-700">
-              <td style={{ width: columnWidths.name }} className="py-3 px-6">{entry.name || scenarioMap[entry.scenario_id] || entry.scenario_id}</td>
-              <td style={{ width: columnWidths.score }} className="py-3 px-6">{entry.score ?? "-"}</td>
-              <td style={{ width: columnWidths.status }} className={`py-3 px-6 font-semibold ${entry.completed ? "text-green-600" : "text-red-600"}`}>
+              <td className="py-3 px-6">{entry.name || scenarioMap[entry.scenario_id] || entry.scenario_id}</td>
+              <td className="py-3 px-6">{entry.score ?? "-"}</td>
+              <td className={`py-3 px-6 font-semibold ${entry.completed ? "text-green-600" : "text-red-600"}`}>
                 {entry.completed ? "Completed" : "Incomplete"}
               </td>
-              <td style={{ width: columnWidths.timeline }} className="py-3 px-6">
+              <td className="py-3 px-6">
                 <button onClick={() => toggleTimeline(entry.sim_uuid)} className="text-blue-600 dark:text-blue-400 underline">
                   {timelines[entry.sim_uuid] ? "Hide" : "Timeline"}
                 </button>
               </td>
-              <td style={{ width: columnWidths.resume }} className="py-3 px-6">
+              <td className="py-3 px-6">
                 {!entry.completed && scenarioMap[entry.scenario_id] ? (
                   <button
                     onClick={() => handleResume(entry)}
@@ -171,13 +134,13 @@ const ProgressTracker = () => {
                 )}
               </td>
             </tr>
-          {timelines[entry.sim_uuid] && (
-            <tr>
-              <td colSpan="5" className="py-3 px-6">
-                <TimelineViewer timeline={timelines[entry.sim_uuid]} />
-              </td>
-            </tr>
-          )}
+            {timelines[entry.sim_uuid] && (
+              <tr>
+                <td colSpan="5" className="py-3 px-6">
+                  <TimelineViewer timeline={timelines[entry.sim_uuid]} />
+                </td>
+              </tr>
+            )}
             </React.Fragment>
           ))}
         </tbody>
