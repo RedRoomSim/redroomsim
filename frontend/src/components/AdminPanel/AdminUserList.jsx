@@ -19,7 +19,6 @@ Changelog:
 */
 
 import React, { useEffect, useState } from "react";
-import useTableSortResize from "../../hooks/useTableSortResize";
 import { db } from "../../../firebase/firebaseConfig";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 
@@ -30,15 +29,6 @@ const AdminUserList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [loading, setLoading] = useState(true);
-
-  const { sortConfig, handleSort, columnWidths, handleMouseDown, sortData } =
-    useTableSortResize({
-      name: 200,
-      email: 220,
-      role: 120,
-      designation: 150,
-      status: 150,
-    });
 
   const totalUsers = users.filter(user => user.role !== 'pending').length;
   const activeUsers = users.filter(user => !user.disabled && user.role !== 'pending').length;
@@ -65,8 +55,6 @@ const AdminUserList = () => {
     );
     setFilteredUsers(filtered);
   }, [searchTerm, users]);
-
-  const sortedUsers = sortData(filteredUsers);
 
   const handleEditClick = (user) => {
     setSelectedUser(user);
@@ -130,50 +118,25 @@ const AdminUserList = () => {
         />
 
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white dark:bg-gray-800 rounded shadow overflow-hidden table-fixed">
+          <table className="min-w-full bg-white dark:bg-gray-800 rounded shadow overflow-hidden">
           <thead className="bg-gray-200 dark:bg-gray-700 text-left">
             <tr>
-              <th style={{ width: columnWidths.name }} className="px-4 py-2">
-                <div className="flex items-center">
-                  <span className="cursor-pointer" onClick={() => handleSort('name')}>Name</span>
-                  <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('name', e)} />
-                </div>
-              </th>
-              <th style={{ width: columnWidths.email }} className="px-4 py-2">
-                <div className="flex items-center">
-                  <span className="cursor-pointer" onClick={() => handleSort('email')}>Email</span>
-                  <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('email', e)} />
-                </div>
-              </th>
-              <th style={{ width: columnWidths.role }} className="px-4 py-2">
-                <div className="flex items-center">
-                  <span className="cursor-pointer" onClick={() => handleSort('role')}>Role</span>
-                  <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('role', e)} />
-                </div>
-              </th>
-              <th style={{ width: columnWidths.designation }} className="px-4 py-2">
-                <div className="flex items-center">
-                  <span className="cursor-pointer" onClick={() => handleSort('designation')}>Designation</span>
-                  <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('designation', e)} />
-                </div>
-              </th>
-              <th style={{ width: columnWidths.status }} className="px-4 py-2">
-                <div className="flex items-center">
-                  <span className="cursor-pointer" onClick={() => handleSort('disabled')}>Account Status</span>
-                  <span className="ml-1 w-2 cursor-col-resize" onMouseDown={(e) => handleMouseDown('status', e)} />
-                </div>
-              </th>
+              <th className="px-4 py-2">Name</th>
+              <th className="px-4 py-2">Email</th>
+              <th className="px-4 py-2">Role</th>
+              <th className="px-4 py-2">Designation</th>
+              <th className="px-4 py-2">Account Status</th>
               <th className="px-4 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {sortedUsers.map(user => (
+            {filteredUsers.map(user => (
               <tr key={user.id} className="border-t border-gray-300 dark:border-gray-600">
-                <td style={{ width: columnWidths.name }} className="px-4 py-2">{user.firstName} {user.lastName}</td>
-                <td style={{ width: columnWidths.email }} className="px-4 py-2">{user.email}</td>
-                <td style={{ width: columnWidths.role }} className="px-4 py-2">{user.role}</td>
-                <td style={{ width: columnWidths.designation }} className="px-4 py-2">{user.designation}</td>
-                <td style={{ width: columnWidths.status }} className="px-4 py-2">{user.disabled ? "Disabled" : "Active"}</td>
+                <td className="px-4 py-2">{user.firstName} {user.lastName}</td>
+                <td className="px-4 py-2">{user.email}</td>
+                <td className="px-4 py-2">{user.role}</td>
+                <td className="px-4 py-2">{user.designation}</td>
+                <td className="px-4 py-2">{user.disabled ? "Disabled" : "Active"}</td>
                 <td className="px-4 py-2">
                   <div className="flex items-center gap-4">
                     <button onClick={() => handleEditClick(user)} className="text-blue-600 hover:underline">
