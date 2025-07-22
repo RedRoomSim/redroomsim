@@ -34,7 +34,7 @@ const useTableSortResize = (initialWidths = {}) => {
 
   const getSortSymbol = useCallback(
     (key) => {
-      if (sortConfig.key !== key) return "↕";
+      if (sortConfig.key !== key) return "";
       return sortConfig.direction === "asc" ? "▲" : "▼";
     },
     [sortConfig]
