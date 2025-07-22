@@ -19,7 +19,8 @@ Changelog:
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import { ThemeProvider } from "./context/ThemeContext"; 
+import { ThemeProvider } from "./context/ThemeContext";
+import { DifficultyProvider } from "./context/DifficultyContext";
 import LoginForm from "./components/Auth/LoginForm";
 import RegisterForm from "./components/Auth/RegisterForm";
 import RoleBasedRedirect from "./components/Auth/RoleBasedRedirect";
@@ -52,6 +53,7 @@ const App = () => {
 
     <ThemeProvider>
       <AuthProvider>
+        <DifficultyProvider>
         <Router>
           <Routes>
             <Route path="/" element={<SecureRoute><RoleBasedRedirect /></SecureRoute>} />
@@ -77,6 +79,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
+        </DifficultyProvider>
       </AuthProvider>
     </ThemeProvider>
   );
