@@ -14,24 +14,22 @@ Changelog:
  - Uses a range input to adjust difficulty level.
 */
 
-import React from "react";
-import { useDifficulty } from "../../context/DifficultyContext";
+import React, { useState } from "react";
 
 const DifficultyAdjuster = () => {
-  const { difficulty, setDifficulty } = useDifficulty();
+  const [difficulty, setDifficulty] = useState(3);
 
   return (
     <div className="bg-white dark:bg-gray-800 dark:text-white rounded-xl shadow p-6">
       <h2 className="text-xl font-bold mb-4">Difficulty Adjuster</h2>
-      <select
+      <input
+        type="range"
+        min="1"
+        max="5"
         value={difficulty}
         onChange={(e) => setDifficulty(e.target.value)}
-        className="p-2 rounded border dark:bg-gray-700 dark:border-gray-600"
-      >
-        <option value="Easy">Easy</option>
-        <option value="Medium">Medium</option>
-        <option value="Hard">Hard</option>
-      </select>
+        className="w-full accent-red-600"
+      />
       <p className="mt-2">Current Difficulty: {difficulty}</p>
     </div>
   );
