@@ -16,6 +16,7 @@ Changelog:
 
 // Import necessary Firebase modules
 import React, { useEffect, useState } from "react";
+import useTableSortResize from "../../hooks/useTableSortResize";
 import axios from "axios";
 import { saveAs } from "file-saver";
 
@@ -34,11 +35,26 @@ const AdminAuditLog = () => {
     endDate: "",
   });
 
+  const {
+    sortConfig,
+    handleSort,
+    columnWidths,
+    handleMouseDown,
+    sortData,
+    getSortSymbol,
+  } = useTableSortResize({
+      actor: 150,
+      action: 120,
+      details: 200,
+      screen: 120,
+      timestamp: 200,
+    });
+
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
-  
-    const filteredLogs = logs.filter((log) => {
+
+  const filteredLogs = logs.filter((log) => {
     const actorMatch = log.actor
       ? log.actor.toLowerCase().includes(filters.actor.toLowerCase())
       : filters.actor === "";
@@ -66,6 +82,8 @@ const AdminAuditLog = () => {
       endMatch
     );
   });
+
+  const sortedLogs = sortData(filteredLogs);
 
   const downloadExcel = async () => {
     if (!filters.startDate || !filters.endDate) return;
@@ -168,24 +186,109 @@ const AdminAuditLog = () => {
               Download
             </button>
           </div>
-          <table className="min-w-full border-collapse">
+          <table className="min-w-full border-collapse table-fixed">
             <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
-                <th className="border dark:border-gray-600 px-4 py-2 text-left">Actor</th>
-                <th className="border dark:border-gray-600 px-4 py-2 text-left">Action</th>
-                <th className="border dark:border-gray-600 px-4 py-2 text-left">Details</th>
-                <th className="border dark:border-gray-600 px-4 py-2 text-left">Screen</th>
-                <th className="border dark:border-gray-600 px-4 py-2 text-left">Timestamp</th>
+                <th
+                  style={{ width: columnWidths.actor }}
+                  className="border dark:border-gray-600 px-4 py-2 text-left"
+                >
+                  <div className="flex items-center">
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => handleSort('actor')}
+                    >
+                      Actor {getSortSymbol('actor')}
+                    </span>
+                    <span
+                      className="ml-2 cursor-col-resize select-none px-1"
+                      onMouseDown={(e) => handleMouseDown('actor', e)}
+                    >|
+                    </span>
+                  </div>
+                </th>
+                <th
+                  style={{ width: columnWidths.action }}
+                  className="border dark:border-gray-600 px-4 py-2 text-left"
+                >
+                  <div className="flex items-center">
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => handleSort('action')}
+                    >
+                      Action {getSortSymbol('action')}
+                    </span>
+                    <span
+                      className="ml-2 cursor-col-resize select-none px-1"
+                      onMouseDown={(e) => handleMouseDown('action', e)}
+                    >|
+                    </span>
+                  </div>
+                </th>
+                <th
+                  style={{ width: columnWidths.details }}
+                  className="border dark:border-gray-600 px-4 py-2 text-left"
+                >
+                  <div className="flex items-center">
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => handleSort('details')}
+                    >
+                      Details {getSortSymbol('details')}
+                    </span>
+                    <span
+                      className="ml-2 cursor-col-resize select-none px-1"
+                      onMouseDown={(e) => handleMouseDown('details', e)}
+                    >|
+                    </span>
+                  </div>
+                </th>
+                <th
+                  style={{ width: columnWidths.screen }}
+                  className="border dark:border-gray-600 px-4 py-2 text-left"
+                >
+                  <div className="flex items-center">
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => handleSort('screen')}
+                    >
+                      Screen {getSortSymbol('screen')}
+                    </span>
+                    <span
+                      className="ml-2 cursor-col-resize select-none px-1"
+                      onMouseDown={(e) => handleMouseDown('screen', e)}
+                    >|
+                    </span>
+                  </div>
+                </th>
+                <th
+                  style={{ width: columnWidths.timestamp }}
+                  className="border dark:border-gray-600 px-4 py-2 text-left"
+                >
+                  <div className="flex items-center">
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => handleSort('timestamp')}
+                    >
+                      Timestamp {getSortSymbol('timestamp')}
+                    </span>
+                    <span
+                      className="ml-2 cursor-col-resize select-none px-1"
+                      onMouseDown={(e) => handleMouseDown('timestamp', e)}
+                    >|
+                    </span>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody>
-              {filteredLogs.map((log, index) => (
+              {sortedLogs.map((log, index) => (
                 <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td className="border dark:border-gray-600 px-4 py-2">{log.actor ?? "-"}</td>
-                  <td className="border dark:border-gray-600 px-4 py-2 capitalize">{log.action}</td>
-                  <td className="border dark:border-gray-600 px-4 py-2">{log.details ?? "-"}</td>
-                  <td className="border dark:border-gray-600 px-4 py-2">{log.screen ?? "-"}</td>
-                  <td className="border dark:border-gray-600 px-4 py-2">
+                  <td style={{ width: columnWidths.actor }} className="border dark:border-gray-600 px-4 py-2">{log.actor ?? "-"}</td>
+                  <td style={{ width: columnWidths.action }} className="border dark:border-gray-600 px-4 py-2 capitalize">{log.action}</td>
+                  <td style={{ width: columnWidths.details }} className="border dark:border-gray-600 px-4 py-2">{log.details ?? "-"}</td>
+                  <td style={{ width: columnWidths.screen }} className="border dark:border-gray-600 px-4 py-2">{log.screen ?? "-"}</td>
+                  <td style={{ width: columnWidths.timestamp }} className="border dark:border-gray-600 px-4 py-2">
                     {new Date(log.timestamp).toLocaleString()}
                   </td>
                 </tr>
