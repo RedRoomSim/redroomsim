@@ -50,8 +50,12 @@ const AdminAuditLog = () => {
       timestamp: 200,
     });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const logsPerPage = 10;
+
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
+    setCurrentPage(1);
   };
 
   const filteredLogs = logs.filter((log) => {
@@ -84,6 +88,10 @@ const AdminAuditLog = () => {
   });
 
   const sortedLogs = sortData(filteredLogs);
+  const totalPages = Math.ceil(sortedLogs.length / logsPerPage);
+  const indexOfLastLog = currentPage * logsPerPage;
+  const indexOfFirstLog = indexOfLastLog - logsPerPage;
+  const currentLogs = sortedLogs.slice(indexOfFirstLog, indexOfLastLog);
 
   const downloadExcel = async () => {
     if (!filters.startDate || !filters.endDate) return;
@@ -111,6 +119,7 @@ const AdminAuditLog = () => {
         // Retrieve audit trail from the backend
         const res = await axios.get("https://api.redroomsim.com/audit/logs");
         setLogs(res.data);
+        setCurrentPage(1);
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error("Failed to fetch audit logs", err);
@@ -282,7 +291,7 @@ const AdminAuditLog = () => {
               </tr>
             </thead>
             <tbody>
-              {sortedLogs.map((log, index) => (
+              {currentLogs.map((log, index) => (
                 <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td style={{ width: columnWidths.actor }} className="border dark:border-gray-600 px-4 py-2">{log.actor ?? "-"}</td>
                   <td style={{ width: columnWidths.action }} className="border dark:border-gray-600 px-4 py-2 capitalize">{log.action}</td>
@@ -295,6 +304,21 @@ const AdminAuditLog = () => {
               ))}
             </tbody>
           </table>
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4 gap-2">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-1 rounded ${currentPage === i + 1
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 dark:bg-gray-700 dark:text-white"}`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
