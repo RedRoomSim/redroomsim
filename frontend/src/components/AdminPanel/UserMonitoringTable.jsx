@@ -21,6 +21,7 @@ Changelog:
 */
 
 import React, { useEffect, useState } from "react";
+import useTableSortResize from "../../hooks/useTableSortResize";
 import axios from "axios";
 
 const UserMonitoringTable = () => {
@@ -31,6 +32,15 @@ const UserMonitoringTable = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const logsPerPage = 10;
+
+  const {
+    sortConfig,
+    handleSort,
+    columnWidths,
+    handleMouseDown,
+    sortData,
+    getSortSymbol,
+  } = useTableSortResize({ email: 150, role: 120, event: 150, timestamp: 200 });
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -58,10 +68,11 @@ const UserMonitoringTable = () => {
     setCurrentPage(1);
   }, [search, logs]);
 
-  const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
+  const sortedLogs = sortData(filteredLogs);
+  const totalPages = Math.ceil(sortedLogs.length / logsPerPage);
   const indexOfLastLog = currentPage * logsPerPage;
   const indexOfFirstLog = indexOfLastLog - logsPerPage;
-  const currentLogs = filteredLogs.slice(indexOfFirstLog, indexOfLastLog);
+  const currentLogs = sortedLogs.slice(indexOfFirstLog, indexOfLastLog);
 
   const exportCSV = () => {
     const headers = "Email,Role,Event,Timestamp\n";
@@ -139,22 +150,90 @@ const UserMonitoringTable = () => {
         <p>No user activity found.</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse table-fixed">
             <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
-                <th className="border dark:border-gray-600 px-4 py-2 text-left">Email</th>
-                <th className="border dark:border-gray-600 px-4 py-2 text-left">Role</th>
-                <th className="border dark:border-gray-600 px-4 py-2 text-left">Event</th>
-                <th className="border dark:border-gray-600 px-4 py-2 text-left">Timestamp</th>
+                <th
+                  style={{ width: columnWidths.email }}
+                  className="border dark:border-gray-600 px-4 py-2 text-left"
+                >
+                  <div className="flex items-center">
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => handleSort("email")}
+                    >
+                      Email {getSortSymbol("email")}
+                    </span>
+                    <span
+                      className="ml-2 cursor-col-resize select-none px-1"
+                      onMouseDown={(e) => handleMouseDown("email", e)}
+                    >|
+                    </span>
+                  </div>
+                </th>
+                <th
+                  style={{ width: columnWidths.role }}
+                  className="border dark:border-gray-600 px-4 py-2 text-left"
+                >
+                  <div className="flex items-center">
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => handleSort("role")}
+                    >
+                      Role {getSortSymbol("role")}
+                    </span>
+                    <span
+                      className="ml-2 cursor-col-resize select-none px-1"
+                      onMouseDown={(e) => handleMouseDown("role", e)}
+                    >|
+                    </span>
+                  </div>
+                </th>
+                <th
+                  style={{ width: columnWidths.event }}
+                  className="border dark:border-gray-600 px-4 py-2 text-left"
+                >
+                  <div className="flex items-center">
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => handleSort("event")}
+                    >
+                      Event {getSortSymbol("event")}
+                    </span>
+                    <span
+                      className="ml-2 cursor-col-resize select-none px-1"
+                      onMouseDown={(e) => handleMouseDown("event", e)}
+                    >|
+                    </span>
+                  </div>
+                </th>
+                <th
+                  style={{ width: columnWidths.timestamp }}
+                  className="border dark:border-gray-600 px-4 py-2 text-left"
+                >
+                  <div className="flex items-center">
+                    <span
+                      className="cursor-pointer"
+                      onClick={() => handleSort("timestamp")}
+                    >
+                      Timestamp {getSortSymbol("timestamp")}
+                    </span>
+                    <span
+                      className="ml-2 cursor-col-resize select-none px-1"
+                      onMouseDown={(e) => handleMouseDown("timestamp", e)}
+                    >|
+                    </span>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody>
               {currentLogs.map((log, index) => (
                 <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td className="border dark:border-gray-600 px-4 py-2">{log.email}</td>
-                  <td className="border dark:border-gray-600 px-4 py-2">{log.role}</td>
-                  <td className="border dark:border-gray-600 px-4 py-2 capitalize">{log.event}</td>
-                  <td className="border dark:border-gray-600 px-4 py-2">{new Date(log.timestamp).toLocaleString()}</td>
+                  <td style={{ width: columnWidths.email }} className="border dark:border-gray-600 px-4 py-2">{log.email}</td>
+                  <td style={{ width: columnWidths.role }} className="border dark:border-gray-600 px-4 py-2">{log.role}</td>
+                  <td style={{ width: columnWidths.event }} className="border dark:border-gray-600 px-4 py-2 capitalize">{log.event}</td>
+                  <td style={{ width: columnWidths.timestamp }} className="border dark:border-gray-600 px-4 py-2">{new Date(log.timestamp).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
