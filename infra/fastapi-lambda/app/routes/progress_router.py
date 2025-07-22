@@ -165,6 +165,7 @@ def get_user_progress(username: str):
             {
                 "id": r.id,
                 "scenario_id": r.scenario_id,
+                "name": r.name,
                 "score": r.score,
                 "completed": r.completed,
                 "sim_uuid": r.sim_uuid,
