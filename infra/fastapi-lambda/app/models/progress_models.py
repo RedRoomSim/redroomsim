@@ -6,17 +6,13 @@ from sqlalchemy import (
     DateTime,
     func,
     ForeignKey,
-    UniqueConstraint,
 )
 from db import Base
 
 
 class SimulationProgress(Base):
     __tablename__ = "simulation_progress"
-    __table_args__ = (
-        UniqueConstraint("username", "scenario_id", name="username_scenario_uc"),
-        {"schema": "redroomsimdb"},
-    )
+    __table_args__ = ({"schema": "redroomsimdb"},)
 
     id = Column(Integer, primary_key=True, index=True)
     sim_uuid = Column(String, unique=True, nullable=False)

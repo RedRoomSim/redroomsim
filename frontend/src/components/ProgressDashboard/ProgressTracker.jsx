@@ -35,7 +35,6 @@ const ProgressTracker = () => {
     sortConfig,
     handleSort,
     columnWidths,
-    handleMouseDown,
     sortData,
     getSortSymbol,
   } = useTableSortResize({
@@ -97,9 +96,25 @@ const ProgressTracker = () => {
       try {
         const res = await axios.get("https://api.redroomsim.com/sim/list");
         const map = {};
-        res.data?.scenarios?.forEach((s) => {
-          map[s.id] = s.name;
-        });
+
+        if (Array.isArray(res.data?.scenarios)) {
+          for (const s of res.data.scenarios) {
+            try {
+              const detail = await axios.get(
+                `https://api.redroomsim.com/sim/${s.id}`
+              );
+              map[s.id] = {
+                name: s.name,
+                steps: Array.isArray(detail.data?.steps)
+                  ? detail.data.steps.length
+                  : 0,
+              };
+            } catch (err) {
+              map[s.id] = { name: s.name, steps: 0 };
+            }
+          }
+        }
+
         setScenarioMap(map);
       } catch (err) {
         console.error("Failed to fetch scenario list", err);
@@ -111,11 +126,11 @@ const ProgressTracker = () => {
   const sortedData = sortData(data);
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl shadow p-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Progress Dashboard</h2>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden text-gray-900 dark:text-white table-fixed">
+        <table className="w-full border-collapse table-auto">
         <thead className="bg-gray-200 dark:bg-gray-700 text-left">
           <tr>
             <th style={{ width: columnWidths.name }} className="py-3 px-6 text-left">
@@ -126,11 +141,7 @@ const ProgressTracker = () => {
                 >
                   Scenario {getSortSymbol('name')}
                 </span>
-                <span
-                  className="ml-2 cursor-col-resize select-none px-1"
-                  onMouseDown={(e) => handleMouseDown('name', e)}
-                >|
-                </span>
+                {/* Resizer removed */}
               </div>
             </th>
             <th style={{ width: columnWidths.score }} className="py-3 px-6 text-left">
@@ -139,13 +150,9 @@ const ProgressTracker = () => {
                   className="cursor-pointer"
                   onClick={() => handleSort('score')}
                 >
-                  Score {getSortSymbol('score')}
+                  Score (%) {getSortSymbol('score')}
                 </span>
-                <span
-                  className="ml-2 cursor-col-resize select-none px-1"
-                  onMouseDown={(e) => handleMouseDown('score', e)}
-                >|
-                </span>
+                {/* Resizer removed */}
               </div>
             </th>
             <th style={{ width: columnWidths.status }} className="py-3 px-6 text-left">
@@ -156,11 +163,7 @@ const ProgressTracker = () => {
                 >
                   Status {getSortSymbol('status')}
                 </span>
-                <span
-                  className="ml-2 cursor-col-resize select-none px-1"
-                  onMouseDown={(e) => handleMouseDown('status', e)}
-                >|
-                </span>
+                {/* Resizer removed */}
               </div>
             </th>
             <th style={{ width: columnWidths.timeline }} className="py-3 px-6 text-left">
@@ -171,11 +174,7 @@ const ProgressTracker = () => {
                 >
                   Timeline {getSortSymbol('timeline')}
                 </span>
-                <span
-                  className="ml-2 cursor-col-resize select-none px-1"
-                  onMouseDown={(e) => handleMouseDown('timeline', e)}
-                >|
-                </span>
+                {/* Resizer removed */}
               </div>
             </th>
             <th style={{ width: columnWidths.resume }} className="py-3 px-6 text-left">
@@ -186,11 +185,7 @@ const ProgressTracker = () => {
                 >
                   Resume {getSortSymbol('resume')}
                 </span>
-                <span
-                  className="ml-2 cursor-col-resize select-none px-1"
-                  onMouseDown={(e) => handleMouseDown('resume', e)}
-                >|
-                </span>
+                {/* Resizer removed */}
               </div>
             </th>
           </tr>
@@ -199,8 +194,17 @@ const ProgressTracker = () => {
           {sortedData.map((entry) => (
             <React.Fragment key={entry.sim_uuid}>
             <tr className="border-b border-gray-200 dark:border-gray-700">
-              <td style={{ width: columnWidths.name }} className="py-3 px-6">{entry.name || scenarioMap[entry.scenario_id] || entry.scenario_id}</td>
-              <td style={{ width: columnWidths.score }} className="py-3 px-6">{entry.score ?? "-"}</td>
+              <td style={{ width: columnWidths.name }} className="py-3 px-6">
+                {entry.name || scenarioMap[entry.scenario_id]?.name || entry.scenario_id}
+              </td>
+              <td style={{ width: columnWidths.score }} className="py-3 px-6">
+                {(() => {
+                  const steps = scenarioMap[entry.scenario_id]?.steps;
+                  if (!steps || !entry.score && entry.score !== 0) return "-";
+                  const pct = Math.round((entry.score / steps) * 100);
+                  return `${pct}%`;
+                })()}
+              </td>
               <td style={{ width: columnWidths.status }} className={`py-3 px-6 font-semibold ${entry.completed ? "text-green-600" : "text-red-600"}`}>
                 {entry.completed ? "Completed" : "Incomplete"}
               </td>

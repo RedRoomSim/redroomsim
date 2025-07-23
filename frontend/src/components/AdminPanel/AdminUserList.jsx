@@ -35,7 +35,6 @@ const AdminUserList = () => {
     sortConfig,
     handleSort,
     columnWidths,
-    handleMouseDown,
     sortData,
     getSortSymbol,
   } = useTableSortResize({
@@ -107,7 +106,7 @@ const AdminUserList = () => {
 
   return (
     <>
-      <div className="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6">
+      <div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl shadow p-6 mb-6">
         <h2 className="text-2xl font-bold mb-4">Manage User</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded shadow">
@@ -136,7 +135,7 @@ const AdminUserList = () => {
         />
 
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white dark:bg-gray-800 rounded shadow overflow-hidden table-fixed">
+          <table className="w-full border-collapse table-auto">
           <thead className="bg-gray-200 dark:bg-gray-700 text-left">
             <tr>
               <th style={{ width: columnWidths.name }} className="px-4 py-2">
@@ -147,11 +146,7 @@ const AdminUserList = () => {
                   >
                     Name {getSortSymbol('name')}
                   </span>
-                  <span
-                    className="ml-2 cursor-col-resize select-none px-1"
-                    onMouseDown={(e) => handleMouseDown('name', e)}
-                  >|
-                  </span>
+                  {/* Resizer removed */}
                 </div>
               </th>
               <th style={{ width: columnWidths.email }} className="px-4 py-2">
@@ -162,11 +157,7 @@ const AdminUserList = () => {
                   >
                     Email {getSortSymbol('email')}
                   </span>
-                  <span
-                    className="ml-2 cursor-col-resize select-none px-1"
-                    onMouseDown={(e) => handleMouseDown('email', e)}
-                  >|
-                  </span>
+                  {/* Resizer removed */}
                 </div>
               </th>
               <th style={{ width: columnWidths.role }} className="px-4 py-2">
@@ -177,11 +168,7 @@ const AdminUserList = () => {
                   >
                     Role {getSortSymbol('role')}
                   </span>
-                  <span
-                    className="ml-2 cursor-col-resize select-none px-1"
-                    onMouseDown={(e) => handleMouseDown('role', e)}
-                  >|
-                  </span>
+                  {/* Resizer removed */}
                 </div>
               </th>
               <th style={{ width: columnWidths.designation }} className="px-4 py-2">
@@ -192,11 +179,7 @@ const AdminUserList = () => {
                   >
                     Designation {getSortSymbol('designation')}
                   </span>
-                  <span
-                    className="ml-2 cursor-col-resize select-none px-1"
-                    onMouseDown={(e) => handleMouseDown('designation', e)}
-                  >|
-                  </span>
+                  {/* Resizer removed */}
                 </div>
               </th>
               <th style={{ width: columnWidths.status }} className="px-4 py-2">
@@ -207,11 +190,7 @@ const AdminUserList = () => {
                   >
                     Account Status {getSortSymbol('status')}
                   </span>
-                  <span
-                    className="ml-2 cursor-col-resize select-none px-1"
-                    onMouseDown={(e) => handleMouseDown('status', e)}
-                  >|
-                  </span>
+                  {/* Resizer removed */}
                 </div>
               </th>
               <th className="px-4 py-2">Actions</th>

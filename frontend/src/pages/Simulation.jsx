@@ -59,7 +59,9 @@ const Simulation = () => {
           map[s.id] = idx; // store mapping for branch navigation
         });
         setStepMap(map); // save map in state
-        setAnalytics((prev) => ({ ...prev, startTime: Date.now() }));
+        const now = Date.now();
+        setAnalytics((prev) => ({ ...prev, startTime: now }));
+        setStartTime(now); // track when the scenario was first loaded
       } catch (error) {
         console.error("Failed to load scenario", error);
       }
