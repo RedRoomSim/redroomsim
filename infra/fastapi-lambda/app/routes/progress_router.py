@@ -195,3 +195,32 @@ def get_user_progress(username: str):
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         db.close()
+
+
+# Return progress records for all users, optionally filtered by username
+@progress_router.get("/all")
+def get_all_progress(username: str | None = None):
+    db = SessionLocal()
+    try:
+        query = db.query(SimulationProgress)
+        if username:
+            query = query.filter(
+                SimulationProgress.username.ilike(f"%{username}%")
+            )
+        records = query.order_by(SimulationProgress.created_at.desc()).all()
+        return [
+            {
+                "scenario_id": r.scenario_id,
+                "name": r.name,
+                "username": r.username,
+                "score": r.score,
+                "completed": r.completed,
+                "sim_uuid": r.sim_uuid,
+                "created_at": r.created_at.isoformat(),
+            }
+            for r in records
+        ]
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        db.close()

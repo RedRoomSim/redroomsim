@@ -84,6 +84,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <Link to="/admin/pending-users" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Pending Approvals</Link>
                 <Link to="/admin/monitoring" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">User Monitoring</Link>
                 <Link to="/admin/audit-log" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Audit Log</Link>
+                <Link to="/admin/training-progress" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Training Progress</Link>
                 <Link to="/admin/scenario-config" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Scenario Config</Link>
                 <Link to="/admin/difficulty" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Difficulty</Link>
               </div>
