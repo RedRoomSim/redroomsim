@@ -40,6 +40,7 @@ const ProgressTracker = () => {
   } = useTableSortResize({
       name: 200,
       score: 120,
+      result: 120,
       status: 150,
       timeline: 120,
       resume: 120,
@@ -155,6 +156,17 @@ const ProgressTracker = () => {
                 {/* Resizer removed */}
               </div>
             </th>
+            <th style={{ width: columnWidths.result }} className="py-3 px-6 text-left">
+              <div className="flex items-center">
+                <span
+                  className="cursor-pointer"
+                  onClick={() => handleSort('result')}
+                >
+                  Result {getSortSymbol('result')}
+                </span>
+                {/* Resizer removed */}
+              </div>
+            </th>
             <th style={{ width: columnWidths.status }} className="py-3 px-6 text-left">
               <div className="flex items-center">
                 <span
@@ -200,9 +212,28 @@ const ProgressTracker = () => {
               <td style={{ width: columnWidths.score }} className="py-3 px-6">
                 {(() => {
                   const steps = scenarioMap[entry.scenario_id]?.steps;
-                  if (!steps || !entry.score && entry.score !== 0) return "-";
+                  if (!steps || (entry.score === null || entry.score === undefined)) return "-";
                   const pct = Math.round((entry.score / steps) * 100);
                   return `${pct}%`;
+                })()}
+              </td>
+              <td
+                style={{ width: columnWidths.result }}
+                className={(() => {
+                  if (!entry.completed) return "py-3 px-6 font-semibold text-gray-600";
+                  const steps = scenarioMap[entry.scenario_id]?.steps;
+                  if (!steps || (entry.score === null || entry.score === undefined))
+                    return "py-3 px-6 font-semibold text-gray-600";
+                  const pct = Math.round((entry.score / steps) * 100);
+                  return `py-3 px-6 font-semibold ${pct >= 70 ? "text-green-600" : "text-red-600"}`;
+                })()}
+              >
+                {(() => {
+                  if (!entry.completed) return "-";
+                  const steps = scenarioMap[entry.scenario_id]?.steps;
+                  if (!steps || (entry.score === null || entry.score === undefined)) return "-";
+                  const pct = Math.round((entry.score / steps) * 100);
+                  return pct >= 70 ? "Pass" : "Fail";
                 })()}
               </td>
               <td style={{ width: columnWidths.status }} className={`py-3 px-6 font-semibold ${entry.completed ? "text-green-600" : "text-red-600"}`}>
@@ -228,7 +259,7 @@ const ProgressTracker = () => {
             </tr>
           {timelines[entry.sim_uuid] && (
             <tr>
-              <td colSpan="5" className="py-3 px-6">
+              <td colSpan="6" className="py-3 px-6">
                 <TimelineViewer timeline={timelines[entry.sim_uuid]} />
               </td>
             </tr>
