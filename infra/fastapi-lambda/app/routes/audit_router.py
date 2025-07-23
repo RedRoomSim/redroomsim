@@ -4,8 +4,25 @@ from datetime import datetime
 import io
 from openpyxl import Workbook
 from pydantic import BaseModel
+from urllib.parse import urlparse
+
 from db import SessionLocal
 from models.logging_models import AuditLog
+
+
+def _normalize_screen(screen: str | None) -> str | None:
+    if not screen:
+        return None
+
+    screen = screen.strip()
+    parsed = urlparse(screen)
+
+    if parsed.scheme and parsed.netloc:
+        if parsed.path and parsed.path != "/":
+            return parsed.path
+        return None
+
+    return screen or None
 
 router = APIRouter()
 
@@ -22,7 +39,12 @@ async def create_audit_log(audit: AuditIn):
     """Persist a new audit event."""
     db = SessionLocal()
     try:
-        record = AuditLog(actor=audit.actor, action=audit.action, details=audit.details, screen=audit.screen)
+        record = AuditLog(
+            actor=audit.actor,
+            action=audit.action,
+            details=audit.details,
+            screen=_normalize_screen(audit.screen),
+        )
         db.add(record)
         db.commit()
         db.refresh(record)

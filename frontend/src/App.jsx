@@ -33,6 +33,7 @@ import AdminMonitoringPage from "./pages/AdminMonitoringPage";
 import AdminAuditLogPage from "./pages/AdminAuditLogPage";
 import AdminScenarioConfigPage from "./pages/AdminScenarioConfigPage";
 import AdminDifficultyPage from "./pages/AdminDifficultyPage";
+import AdminTrainingProgressPage from "./pages/AdminTrainingProgressPage";
 import Dashboard from "./pages/Dashboard";
 import ScenarioSelectorPage from "./pages/ScenarioSelectorPage";
 import Simulation from "./pages/Simulation";
@@ -64,6 +65,7 @@ const App = () => {
             <Route path="/admin/monitoring" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminMonitoringPage /></Layout></RoleProtectedRoute></SecureRoute>} />
             <Route path="/admin/audit-log" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminAuditLogPage /></Layout></RoleProtectedRoute></SecureRoute>} />
             <Route path="/admin/scenario-config" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminScenarioConfigPage /></Layout></RoleProtectedRoute></SecureRoute>} />
+            <Route path="/admin/training-progress" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminTrainingProgressPage /></Layout></RoleProtectedRoute></SecureRoute>} />
             <Route path="/admin/difficulty" element={<SecureRoute><RoleProtectedRoute allowedRoles={["admin"]}><Layout><AdminDifficultyPage /></Layout></RoleProtectedRoute></SecureRoute>} />
             <Route path="/dashboard" element={<SecureRoute><Layout><Dashboard /></Layout></SecureRoute>} />
             <Route path="/scenarios" element={<SecureRoute><Layout><ScenarioSelectorPage /></Layout></SecureRoute>} />
