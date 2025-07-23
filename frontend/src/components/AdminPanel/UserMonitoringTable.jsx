@@ -37,7 +37,6 @@ const UserMonitoringTable = () => {
     sortConfig,
     handleSort,
     columnWidths,
-    handleMouseDown,
     sortData,
     getSortSymbol,
   } = useTableSortResize({ email: 150, role: 120, event: 150, timestamp: 200 });
@@ -155,7 +154,7 @@ const UserMonitoringTable = () => {
         <p>No user activity found.</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse table-fixed">
+          <table className="w-full border-collapse table-auto">
             <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
                 <th
@@ -169,11 +168,7 @@ const UserMonitoringTable = () => {
                     >
                       Email {getSortSymbol("email")}
                     </span>
-                    <span
-                      className="ml-2 cursor-col-resize select-none px-1"
-                      onMouseDown={(e) => handleMouseDown("email", e)}
-                    >|
-                    </span>
+                    {/* Resizer removed */}
                   </div>
                 </th>
                 <th
@@ -187,11 +182,7 @@ const UserMonitoringTable = () => {
                     >
                       Role {getSortSymbol("role")}
                     </span>
-                    <span
-                      className="ml-2 cursor-col-resize select-none px-1"
-                      onMouseDown={(e) => handleMouseDown("role", e)}
-                    >|
-                    </span>
+                    {/* Resizer removed */}
                   </div>
                 </th>
                 <th
@@ -205,11 +196,7 @@ const UserMonitoringTable = () => {
                     >
                       Event {getSortSymbol("event")}
                     </span>
-                    <span
-                      className="ml-2 cursor-col-resize select-none px-1"
-                      onMouseDown={(e) => handleMouseDown("event", e)}
-                    >|
-                    </span>
+                    {/* Resizer removed */}
                   </div>
                 </th>
                 <th
@@ -223,11 +210,7 @@ const UserMonitoringTable = () => {
                     >
                       Timestamp {getSortSymbol("timestamp")}
                     </span>
-                    <span
-                      className="ml-2 cursor-col-resize select-none px-1"
-                      onMouseDown={(e) => handleMouseDown("timestamp", e)}
-                    >|
-                    </span>
+                    {/* Resizer removed */}
                   </div>
                 </th>
               </tr>

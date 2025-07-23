@@ -39,7 +39,6 @@ const AdminAuditLog = () => {
     sortConfig,
     handleSort,
     columnWidths,
-    handleMouseDown,
     sortData,
     getSortSymbol,
   } = useTableSortResize({
@@ -137,7 +136,7 @@ const AdminAuditLog = () => {
   }, []);
 
   return (
-    <div className="bg-white dark:bg-gray-800 dark:text-white rounded-xl shadow p-6">
+    <div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl shadow p-6">
       <h2 className="text-xl font-bold mb-4">Admin Audit Log</h2>
       {loading ? (
         <p>Loading...</p>
@@ -200,7 +199,7 @@ const AdminAuditLog = () => {
               Download
             </button>
           </div>
-          <table className="min-w-full border-collapse table-fixed">
+          <table className="w-full border-collapse table-auto">
             <thead className="bg-gray-100 dark:bg-gray-700">
               <tr>
                 <th
@@ -214,11 +213,7 @@ const AdminAuditLog = () => {
                     >
                       Actor {getSortSymbol('actor')}
                     </span>
-                    <span
-                      className="ml-2 cursor-col-resize select-none px-1"
-                      onMouseDown={(e) => handleMouseDown('actor', e)}
-                    >|
-                    </span>
+                    {/* Resizer removed */}
                   </div>
                 </th>
                 <th
@@ -232,11 +227,7 @@ const AdminAuditLog = () => {
                     >
                       Action {getSortSymbol('action')}
                     </span>
-                    <span
-                      className="ml-2 cursor-col-resize select-none px-1"
-                      onMouseDown={(e) => handleMouseDown('action', e)}
-                    >|
-                    </span>
+                    {/* Resizer removed */}
                   </div>
                 </th>
                 <th
@@ -250,11 +241,7 @@ const AdminAuditLog = () => {
                     >
                       Details {getSortSymbol('details')}
                     </span>
-                    <span
-                      className="ml-2 cursor-col-resize select-none px-1"
-                      onMouseDown={(e) => handleMouseDown('details', e)}
-                    >|
-                    </span>
+                    {/* Resizer removed */}
                   </div>
                 </th>
                 <th
@@ -268,11 +255,7 @@ const AdminAuditLog = () => {
                     >
                       Screen {getSortSymbol('screen')}
                     </span>
-                    <span
-                      className="ml-2 cursor-col-resize select-none px-1"
-                      onMouseDown={(e) => handleMouseDown('screen', e)}
-                    >|
-                    </span>
+                    {/* Resizer removed */}
                   </div>
                 </th>
                 <th
@@ -286,11 +269,7 @@ const AdminAuditLog = () => {
                     >
                       Timestamp {getSortSymbol('timestamp')}
                     </span>
-                    <span
-                      className="ml-2 cursor-col-resize select-none px-1"
-                      onMouseDown={(e) => handleMouseDown('timestamp', e)}
-                    >|
-                    </span>
+                    {/* Resizer removed */}
                   </div>
                 </th>
               </tr>
