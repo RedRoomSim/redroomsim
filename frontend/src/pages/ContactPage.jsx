@@ -21,7 +21,16 @@ const ContactPage = () => {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Contact Us</h1>
-      <p>If you need assistance, please contact our support team at <a href="mailto:support@redroomsim.com" className="text-red-500">support@redroomsim.com</a>.</p>
+      <p>
+        If you need assistance, please open an issue on our {' '}
+        <a
+          href="https://github.com/RedRoomSim/redroomsim/issues"
+          className="text-red-500"
+        >
+          GitHub repository
+        </a>
+        .
+      </p>
     </div>
   );
 };

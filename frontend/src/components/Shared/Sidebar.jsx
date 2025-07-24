@@ -91,7 +91,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             )}
             <Link to="/upload" className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
               <span className="text-2xl">📤</span>
-              {isOpen && <span>Upload Evidence</span>}
+              {isOpen && <span>Upload Scenario</span>}
             </Link>
           </>
         )}
