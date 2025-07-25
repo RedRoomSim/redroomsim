@@ -5,6 +5,7 @@ import io
 from openpyxl import Workbook
 from pydantic import BaseModel
 from urllib.parse import urlparse
+import logging
 
 from db import SessionLocal
 from models.logging_models import AuditLog
@@ -51,7 +52,8 @@ async def create_audit_log(audit: AuditIn):
         return {"id": record.id}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Error creating audit log")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         db.close()
 
@@ -94,7 +96,8 @@ def get_audit_logs(
             for log in logs
         ]
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Error retrieving audit logs")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         db.close()
 
@@ -139,6 +142,7 @@ def export_audit_logs(start_date: str, end_date: str):
             headers=headers,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Error exporting audit logs")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         db.close()
