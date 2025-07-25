@@ -1,17 +1,36 @@
 from fastapi import APIRouter, Request, HTTPException
 import logging
+from ipaddress import ip_address as _validate_ip
 from db import SessionLocal
 from models.logging_models import UserLoginLog
 from services.audit_service import record_audit_event
 
 router = APIRouter()
 
+
+def _get_client_ip(request: Request) -> tuple[str | None, str | None, str | None]:
+    """Return best-guess client IP and the raw host/forwarded values."""
+    client_host = request.client.host if request.client else None
+    forwarded_for = request.headers.get("x-forwarded-for")
+    chosen_ip = client_host
+    forwarded_ip = None
+    if forwarded_for:
+        candidate = forwarded_for.split(",")[0].strip()
+        try:
+            _validate_ip(candidate)
+            chosen_ip = candidate
+            forwarded_ip = candidate
+        except ValueError:
+            # Ignore invalid forwarded header
+            pass
+    return chosen_ip, client_host, forwarded_ip
+
 @router.post("/log-login")
 async def log_user_login(request: Request):
     data = await request.json()
     db = SessionLocal()
     try:
-        ip_address = request.client.host
+        ip_address, client_host, forwarded_ip = _get_client_ip(request)
         log_entry = UserLoginLog(
             uid=data["uid"],
             email=data["email"],
@@ -23,7 +42,8 @@ async def log_user_login(request: Request):
         db.commit()
         # Record this login in the audit log
         screen = request.headers.get("x-screen") or request.headers.get("referer")
-        record_audit_event(actor=data["email"], action="login", screen=screen)
+        details = f"forwarded_for={forwarded_ip or 'N/A'} client_host={client_host}"
+        record_audit_event(actor=data["email"], action="login", screen=screen, details=details)
         return {"message": "Login logged"}
     except Exception as e:
         db.rollback()
@@ -60,7 +80,7 @@ async def log_failed_login(request: Request):
     data = await request.json()
     db = SessionLocal()
     try:
-        ip_address = request.client.host
+        ip_address, client_host, forwarded_ip = _get_client_ip(request)
         log_entry = UserLoginLog(
             uid=data.get("uid", None),
             email=data["email"],
@@ -72,7 +92,8 @@ async def log_failed_login(request: Request):
         db.commit()
         # Track failed attempts to help with security reviews
         screen = request.headers.get("x-screen") or request.headers.get("referer")
-        record_audit_event(actor=data.get("email"), action="failed_login", screen=screen)
+        details = f"forwarded_for={forwarded_ip or 'N/A'} client_host={client_host}"
+        record_audit_event(actor=data.get("email"), action="failed_login", screen=screen, details=details)
         return {"message": "Failed login logged"}
     except Exception as e:
         db.rollback()

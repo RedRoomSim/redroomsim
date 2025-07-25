@@ -9,8 +9,17 @@ RedRoomSim is a browser-based, interactive training platform designed to meet th
 
 API deployment commands
 
-1. pip install -t dependencies -r requirements.txt   
+1. pip install -t dependencies -r requirements.txt
 2. pip install zip-files
-3. cd .\dependencies 
+3. cd .\dependencies
 4. Get-ChildItem -Recurse | zip-files -o ..\aws_lambda_artifact.zip
 5. zip-files ..\aws_lambda_artifact.zip ..\main.py
+
+## Proxy considerations
+
+When the API is deployed behind a reverse proxy or load balancer, the proxy
+should set the `X-Forwarded-For` header with the original client IP address. The
+logging endpoints will prefer this header when it contains a valid IP. If the
+header is missing or invalid, the FastAPI `request.client.host` value will be
+used instead. Both the forwarded address and the original host are included in
+audit log entries for traceability.
