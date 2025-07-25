@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException
+import logging
 from db import SessionLocal
 from models.logging_models import UserLoginLog
 from services.audit_service import record_audit_event
@@ -49,7 +50,8 @@ async def log_logout(request: Request):
         return {"message": "Logout logged"}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Error logging logout")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         db.close()
         
@@ -74,7 +76,8 @@ async def log_failed_login(request: Request):
         return {"message": "Failed login logged"}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Error logging failed login")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         db.close()
 
@@ -97,7 +100,8 @@ async def log_password_change(request: Request):
         return {"message": "Password change logged"}
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Error logging password change")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         db.close()
 

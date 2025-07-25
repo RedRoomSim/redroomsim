@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+import logging
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import func
 from db import SessionLocal
@@ -60,7 +61,8 @@ def save_progress(progress: ProgressIn):
             return {"simulation_id": sim_uuid}
     except SQLAlchemyError as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Error saving progress")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         db.close()
 
@@ -114,7 +116,8 @@ def save_step_progress(step: StepProgressIn):
         return {"status": "saved"}
     except SQLAlchemyError as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Error saving step progress")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         db.close()
 
@@ -140,7 +143,8 @@ def get_progress(username: str, simulation_id: str):
             "simulation_id": record.sim_uuid,
         }
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Error retrieving progress")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         db.close()
 
@@ -165,7 +169,8 @@ def get_timeline(simulation_id: str):
             for r in records
         ]
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Error retrieving timeline")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         db.close()
 
@@ -192,7 +197,8 @@ def get_user_progress(username: str):
             for r in records
         ]
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Error retrieving user progress")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         db.close()
 
@@ -221,6 +227,7 @@ def get_all_progress(username: str | None = None):
             for r in records
         ]
     except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.exception("Error retrieving all progress")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
         db.close()
