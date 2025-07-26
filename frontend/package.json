@@ -12,7 +12,7 @@
     "axios": "^1.10.0",
     "firebase": "^11.9.1",
     "lucide-react": "^0.517.0",
-    "react": "18.2.0",
+    "react": "18.3.1",
     "react-dom": "18.2.0",
     "react-router-dom": "6.22.3",
     "file-saver": "^2.0.5"
