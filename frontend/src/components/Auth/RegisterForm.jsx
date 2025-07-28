@@ -22,7 +22,7 @@ Changelog:
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import ResponsiveContainer from "../Shared/ResponsiveContainer";
+import bg from "../../assets/bg-login.png";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../../firebase/firebaseConfig";
@@ -39,7 +39,7 @@ const RegisterForm = () => {
     lastName: "",
     email: "",
     password: "",
-    designation: ""
+    designation: "",
   });
 
   const [error, setError] = useState("");
@@ -84,78 +84,98 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100 dark:bg-gray-900">
-      <ResponsiveContainer>
-      <form onSubmit={handleRegister} className="bg-white dark:bg-gray-800 p-8 rounded shadow-md w-full sm:w-96 space-y-4">
-        <div className="flex justify-center mb-4">
-          <img src={logo} alt="Red Room Simulation" className="h-16 w-16" />
+    <div
+      className="min-h-screen bg-no-repeat bg-cover bg-center text-white"
+      style={{ backgroundImage: `url(${bg})` }}
+    >
+      <div className="h-screen flex items-center justify-center relative">
+        <img
+          src={logo}
+          alt="Red Room Simulation"
+          className="fixed left-1/2 transition-[top,transform] duration-500 ease-in-out"
+          style={{
+            top: "1rem",
+            transform: "translateX(-50%) scale(0.4)",
+            height: "35vh",
+            zIndex: 20,
+          }}
+        />
+      </div>
+      <div
+        className="fixed left-0 right-0 top-[30vh] flex flex-col md:flex-row items-start justify-between px-4 md:px-20 py-10"
+        style={{ zIndex: 1 }}
+      >
+        <div className="md:w-1/2 md:pr-10 mb-10 md:mb-0">
+          <h1 className="text-4xl font-bold mb-6">
+            Train Like a Real Analyst. Think Like a Threat Actor.
+          </h1>
+          <p className="mb-4">
+            RedRoomSim is an interactive browser-based training platform built for cyber threat intelligence (CTI) professionals.
+          </p>
+          <p className="mb-4">
+            Step into realistic simulations inspired by real-world threat reports, dark web intelligence, and curated feeds.
+          </p>
+          <p>
+            Sharpen your triage and incident response skills under pressure—with real-time feedback that turns theory into action.
+          </p>
         </div>
-
-        <h2 className="text-2xl font-bold text-center dark:text-white">Red Room Simulation - Register</h2>
-
-        {error && <div className="text-red-500 text-center">{error}</div>}
-
-        <input
-          type="text"
-          name="firstName"
-          placeholder="First Name"
-          value={form.firstName}
-          onChange={handleChange}
-          className="border p-2 rounded w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
-          required
-        />
-
-        <input
-          type="text"
-          name="lastName"
-          placeholder="Last Name"
-          value={form.lastName}
-          onChange={handleChange}
-          className="border p-2 rounded w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
-          required
-        />
-
-        <input
-          type="text"
-          name="designation"
-          placeholder="Designation"
-          value={form.designation}
-          onChange={handleChange}
-          className="border p-2 rounded w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
-        />
-
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          className="border p-2 rounded w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
-          required
-        />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          className="border p-2 rounded w-full dark:bg-gray-700 dark:text-white dark:border-gray-600"
-          required
-        />
-
-        <button type="submit" className="w-full bg-red-600 text-white p-2 rounded hover:bg-red-700">
-          Register
-        </button>
-
-        <div className="text-center mt-2 dark:text-white">
-          Already have an account?{" "}
-          <span className="text-red-600 hover:underline cursor-pointer" onClick={() => navigate("/login")}>
-            Login here
-          </span>
-        </div>
-      </form>
-      </ResponsiveContainer>
+        <form onSubmit={handleRegister} className="bg-black bg-opacity-70 p-8 rounded shadow-md w-full md:w-1/2 space-y-4">
+          {error && <div className="text-red-400 text-center">{error}</div>}
+          <input
+            type="text"
+            name="firstName"
+            placeholder="First Name"
+            value={form.firstName}
+            onChange={handleChange}
+            className="border p-2 rounded w-full bg-gray-700 bg-opacity-50"
+            required
+          />
+          <input
+            type="text"
+            name="lastName"
+            placeholder="Last Name"
+            value={form.lastName}
+            onChange={handleChange}
+            className="border p-2 rounded w-full bg-gray-700 bg-opacity-50"
+            required
+          />
+          <input
+            type="text"
+            name="designation"
+            placeholder="Designation"
+            value={form.designation}
+            onChange={handleChange}
+            className="border p-2 rounded w-full bg-gray-700 bg-opacity-50"
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            className="border p-2 rounded w-full bg-gray-700 bg-opacity-50"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            className="border p-2 rounded w-full bg-gray-700 bg-opacity-50"
+            required
+          />
+          <button type="submit" className="w-full bg-red-600 text-white p-2 rounded hover:bg-red-700">
+            Register
+          </button>
+          <div className="text-center mt-2">
+            Already have an account?{' '}
+            <span className="text-red-400 hover:underline cursor-pointer" onClick={() => navigate('/login')}>
+              Login here
+            </span>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

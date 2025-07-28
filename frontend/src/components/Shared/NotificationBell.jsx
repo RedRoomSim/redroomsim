@@ -53,7 +53,7 @@ const NotificationBell = () => {
   return (
     <div className="relative">
       <button onClick={() => setOpen(!open)} className="relative" title="Notifications">
-        <span className="text-2xl">🔔</span>
+        <span className={`text-2xl ${notifications.length > 0 ? 'pulse accent-text accent-glow' : ''}`}>🔔</span>
         {notifications.length > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full text-xs px-1">
             {notifications.length}
