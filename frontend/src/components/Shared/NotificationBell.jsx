@@ -3,6 +3,7 @@ import axios from "axios";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase/firebaseConfig";
 import { useAuth } from "../../context/AuthContext";
+import { Bell } from "lucide-react";
 
 const NotificationBell = () => {
   const [notifications, setNotifications] = useState([]);
@@ -52,8 +53,14 @@ const NotificationBell = () => {
 
   return (
     <div className="relative">
-      <button onClick={() => setOpen(!open)} className="relative" title="Notifications">
-        <span className={`text-2xl ${notifications.length > 0 ? 'pulse accent-text accent-glow' : ''}`}>🔔</span>
+      <button
+        onClick={() => setOpen(!open)}
+        className="relative accent-text opacity-80 hover:opacity-100"
+        title="Notifications"
+      >
+        <Bell
+          className={`w-5 h-5 ${notifications.length > 0 ? 'pulse accent-glow' : ''}`}
+        />
         {notifications.length > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full text-xs px-1">
             {notifications.length}
