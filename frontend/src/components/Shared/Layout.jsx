@@ -42,7 +42,7 @@ const Layout = ({ children }) => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-white text-gray-900 dark:bg-gray-900 dark:text-white bg-[radial-gradient(#2d3748_1px,transparent_1px)] dark:bg-[radial-gradient(#4a5568_1px,transparent_1px)] bg-[length:20px_20px]">
+    <div className="min-h-screen w-full overflow-x-auto bg-white text-gray-900 dark:bg-gray-900 dark:text-white bg-[radial-gradient(#2d3748_1px,transparent_1px)] dark:bg-[radial-gradient(#4a5568_1px,transparent_1px)] bg-[length:20px_20px]">
       <div className="flex h-full">
         <Sidebar isOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         {sidebarOpen && (

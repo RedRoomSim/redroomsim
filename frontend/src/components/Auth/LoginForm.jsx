@@ -43,7 +43,12 @@ const LoginForm = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
-    window.addEventListener("scroll", handleScroll);
+    // Automatically show form on mobile where scrolling may not trigger
+    if (window.innerWidth <= 768) {
+      setScrolled(true);
+    } else {
+      window.addEventListener("scroll", handleScroll);
+    }
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -65,7 +70,7 @@ const LoginForm = () => {
 
   return (
     <div
-       className="min-h-screen overflow-y-auto bg-no-repeat bg-cover bg-center text-white pb-[70vh] md:pb-[60vh]"
+       className="min-h-[120vh] md:min-h-screen overflow-y-auto bg-no-repeat bg-cover bg-center text-white pb-[90vh] md:pb-[60vh]"
       style={{ backgroundImage: `url(${bg})` }}
     >
       <div className="h-screen flex items-center justify-center relative">
@@ -84,11 +89,13 @@ const LoginForm = () => {
         />
       </div>
       <div
-        className={`fixed left-0 right-0 top-[30vh] flex flex-col md:flex-row items-start justify-between px-4 md:px-20 py-10 transition-opacity duration-500 ${scrolled ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+
+        className={`relative md:fixed md:left-0 md:right-0 md:top-[30vh] flex flex-col lg:flex-row items-center lg:items-start justify-between space-y-8 lg:space-y-0 px-4 lg:px-20 py-10 transition-opacity duration-500 ${scrolled ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+
         style={{ zIndex: 1 }}
     >
 
-        <div className="md:w-1/2 md:pr-10 mb-10 md:mb-0">
+        <div className="lg:w-1/2 lg:pr-10 mb-10 lg:mb-0 text-center lg:text-left">
           <h1 className="text-4xl font-bold mb-6">
             Train Like a Real Analyst. Think Like a Threat Actor.
           </h1>
@@ -104,7 +111,7 @@ const LoginForm = () => {
         </div>
         <form
           onSubmit={handleSubmit}
-          className="bg-black bg-opacity-70 p-8 rounded shadow-md w-full md:w-1/2 space-y-4"
+          className="bg-black bg-opacity-70 p-8 rounded shadow-md w-full lg:w-1/2 space-y-4"
         >
           {error && <div className="text-red-400 text-center">{error}</div>}
           <input

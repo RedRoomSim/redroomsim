@@ -41,6 +41,11 @@ const TimelineViewer = ({ timeline }) => {
             <p>
               <b>Feedback:</b> {entry.feedback}
             </p>
+            {entry.timestamp && (
+              <p className="text-sm text-gray-500 mt-1">
+                ⏰ Time: {new Date(entry.timestamp).toLocaleString()}
+              </p>
+            )}
             {/*<p className="text-sm text-gray-500 mt-1">⏱️ Time: {(entry.timeMs / 1000).toFixed(2)} seconds</p>*/}
           </li>
         ))}
