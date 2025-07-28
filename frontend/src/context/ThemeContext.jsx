@@ -28,6 +28,16 @@ export const ThemeProvider = ({ children }) => {
     cyan: "#00ffff",
     teal: "#0dffc9",
     purple: "#bf00ff",
+    aqua: "#00ffff",
+    magenta: "#ff00ff",
+    orange: "#ff7f00",
+    red: "#ff0000", 
+    yellow: "#ffff00",
+    green: "#00ff00",
+    blue: "#0000ff",
+    pink: "#ff1493",
+    gray: "#808080",
+    brown: "#a52a2a",
   };
 
   useEffect(() => {
