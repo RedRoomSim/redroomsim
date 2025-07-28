@@ -41,7 +41,7 @@ const getPasswordStrength = (password) => {
 };
 
 const SettingsPage = () => {
-  const { theme, accent, toggleTheme, cycleAccent } = useTheme();
+  const { theme, accent, accentMap, toggleTheme, updateAccent } = useTheme();
   const { user } = useAuth();
   const { logPasswordChange } = useAuth();
   const [showToast, setShowToast] = useState(false);
@@ -116,11 +116,19 @@ const handlePasswordReset = async () => {
         <div className="flex items-center justify-between mt-4">
           <span className="font-medium">Accent Color</span>
           <select
-            onClick={cycleAccent}
+            value={accent}
+            onChange={(e) => updateAccent(e.target.value)}
             className="px-3 py-1 rounded text-black"
-            style={{ backgroundColor: 'var(--accent-color)' }}
           >
-            {accent}
+            {Object.keys(accentMap).map((color) => (
+              <option
+                key={color}
+                value={color}
+                style={{ backgroundColor: accentMap[color], color: "#000" }}
+              >
+                {color}
+              </option>
+            ))}
           </select>
         </div>
       </div>

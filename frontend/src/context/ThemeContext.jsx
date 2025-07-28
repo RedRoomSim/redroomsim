@@ -61,8 +61,14 @@ export const ThemeProvider = ({ children }) => {
     setAccent(colors[(idx + 1) % colors.length]);
   };
 
+  const updateAccent = (color) => {
+    if (accentMap[color]) {
+      setAccent(color);
+    }
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, accent, toggleTheme, cycleAccent }}>
+    <ThemeContext.Provider value={{ theme, accent, accentMap, toggleTheme, cycleAccent, updateAccent }}>
       {children}
     </ThemeContext.Provider>
   );
