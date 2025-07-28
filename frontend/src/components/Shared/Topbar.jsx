@@ -16,19 +16,27 @@ Changelog:
 */
 
 // Import necessary libraries and components
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import userAvatar from "../../assets/user.png";
 import logo from "../../assets/logo.png";
-import logoutImage from "../../assets/logout.png";
 import NotificationBell from "./NotificationBell";
+import { Menu, HelpCircle, Phone, Settings as Cog, LogOut } from "lucide-react";
 
 const Topbar = ({ sidebarOpen, toggleSidebar }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [showToast, setShowToast] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const confirmLogout = () => setShowConfirm(true);
 
@@ -80,12 +88,10 @@ const Topbar = ({ sidebarOpen, toggleSidebar }) => {
       )}
 
       {/* Topbar */}
-      <div className="w-full flex items-center justify-between bg-white dark:bg-[#1f2937] text-gray-900 dark:text-white h-16 px-4 shadow-md transition-colors">
+      <div className="w-full flex items-center justify-between bg-white/60 dark:bg-gray-800/60 backdrop-blur-md text-gray-900 dark:text-white h-16 px-4 shadow-md transition-colors">
         <div className="flex items-center space-x-2">
           <button onClick={toggleSidebar} className="sm:hidden mr-2 focus:outline-none" aria-label="Toggle menu">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <Menu className="w-6 h-6" />
           </button>
           <Link to="/dashboard" title="Go to Dashboard">
             <img src={logo} alt="Logo" className="h-10 w-10 transition-transform hover:scale-105" />
@@ -93,25 +99,26 @@ const Topbar = ({ sidebarOpen, toggleSidebar }) => {
           <h1 className="text-xl font-bold hidden sm:block">Red Room Simulation</h1>
         </div>
         <div className="flex items-center space-x-4">
-          <Link to="/help" className="hover:text-red-600" title="Help">
-            <span className="text-2xl">❓</span>
+          <span className="hidden md:block font-mono text-sm accent-text accent-glow">{currentTime}</span>
+          <Link to="/help" className="accent-text accent-glow opacity-80 hover:opacity-100" title="Help">
+            <HelpCircle className="w-5 h-5" />
           </Link>
-          <Link to="/contact" className="hover:text-red-600" title="Contact">
-            <span className="text-2xl">📞</span>
+          <Link to="/contact" className="accent-text accent-glow opacity-80 hover:opacity-100" title="Contact">
+            <Phone className="w-5 h-5" />
           </Link>
           <NotificationBell />
-          <Link to="/settings" className="hover:text-red-600" title="Settings">
-            <span className="text-2xl">⚙️</span>
+          <Link to="/settings" className="accent-text accent-glow opacity-80 hover:opacity-100" title="Settings">
+            <Cog className="w-5 h-5" />
           </Link>
-          <Link to="/profile" className="hover:text-red-600" title="My Profile">
+          <Link to="/profile" className="accent-text opacity-80 hover:opacity-100" title="My Profile">
             <img
               src={userAvatar}
               alt="User"
               className="h-10 w-10 rounded-full border border-gray-300 dark:border-gray-600 object-cover"
             />
           </Link>
-          <button onClick={confirmLogout} title="Logout">
-            <img src={logoutImage} alt="Logout" className="h-6 w-6" />
+          <button onClick={confirmLogout} title="Logout" className="accent-text accent-glow opacity-80 hover:opacity-100">
+            <LogOut className="w-5 h-5" />
           </button>
         </div>
       </div>

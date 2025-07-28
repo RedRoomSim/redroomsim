@@ -23,6 +23,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import logo from "../../assets/logo.png";
+import { Menu, LayoutDashboard, Puzzle, Upload, Settings, ChevronRight } from "lucide-react";
 
 // Sidebar component renders the navigation sidebar with links and user role-based menu items
 const Sidebar = ({ isOpen, toggleSidebar }) => {
@@ -32,15 +33,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   return (
     <div
       className={`fixed top-0 left-0 h-full z-40 shadow-lg transform transition-all duration-300
-        bg-white dark:bg-[#1f2937] text-gray-900 dark:text-white
+        bg-white/60 dark:bg-gray-800/60 backdrop-blur-md text-gray-900 dark:text-white
         ${isOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64 sm:translate-x-0 sm:w-20'}`}
     >
       {/* Hamburger icon aligned left */}
       <div className="flex items-center justify-start mt-4 px-4">
-        <button onClick={toggleSidebar} className="focus:outline-none">
-          <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
+        <button onClick={toggleSidebar} className="focus:outline-none accent-text accent-glow">
+          <Menu className="w-7 h-7" />
         </button>
       </div>
 
@@ -56,42 +55,42 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       {/* Sidebar navigation links */}
       <div className="mt-10 space-y-4 flex flex-col">
-        <Link to="/dashboard" className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
-          <span className="text-2xl">📊</span>
-          {isOpen && <span>Dashboard</span>}
+        <Link to="/dashboard" className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 accent-text">
+          <LayoutDashboard className="w-5 h-5 accent-glow" />
+          {isOpen && <span className="accent-text">Dashboard</span>}
         </Link>
 
-        <Link to="/scenarios" className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
-          <span className="text-2xl">🧩</span>
-          {isOpen && <span>Scenarios</span>}
+        <Link to="/scenarios" className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 accent-text">
+          <Puzzle className="w-5 h-5 accent-glow" />
+          {isOpen && <span className="accent-text">Scenarios</span>}
         </Link>
 
         {role === "admin" && (
           <>
             <button
               onClick={() => setAdminMenuOpen(!adminMenuOpen)}
-              className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 w-full text-left"
+              className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 w-full text-left accent-text"
             >
-              <span className="text-2xl">⚙️</span>
-              {isOpen && <span>Admin Panel</span>}
+              <Settings className="w-5 h-5 accent-glow" />
+              {isOpen && <span className="accent-text">Admin Panel</span>}
               {isOpen && (
-                <span className={`ml-auto transform transition-transform ${adminMenuOpen ? 'rotate-90' : ''}`}>▶</span>
+                <ChevronRight className={`ml-auto transform transition-transform ${adminMenuOpen ? 'rotate-90' : ''} accent-glow`} />
               )}
             </button>
-            {isOpen && adminMenuOpen && (
-              <div className="ml-8 mt-1 flex flex-col space-y-1">
-                <Link to="/admin/users" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Manage Users</Link>
-                <Link to="/admin/pending-users" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Pending Approvals</Link>
-                <Link to="/admin/monitoring" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">User Monitoring</Link>
-                <Link to="/admin/audit-log" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Audit Log</Link>
-                <Link to="/admin/training-progress" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Training Progress</Link>
-                <Link to="/admin/scenario-config" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Scenario Config</Link>
-                <Link to="/admin/difficulty" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">Difficulty</Link>
+            {isOpen && (
+              <div className={`ml-8 mt-1 flex flex-col space-y-1 transition-all overflow-hidden ${adminMenuOpen ? 'max-h-96' : 'max-h-0'}` }>
+                <Link to="/admin/users" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 accent-text">Manage Users</Link>
+                <Link to="/admin/pending-users" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 accent-text">Pending Approvals</Link>
+                <Link to="/admin/monitoring" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 accent-text">User Monitoring</Link>
+                <Link to="/admin/audit-log" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 accent-text">Audit Log</Link>
+                <Link to="/admin/training-progress" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 accent-text">Training Progress</Link>
+                <Link to="/admin/scenario-config" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 accent-text">Scenario Config</Link>
+                <Link to="/admin/difficulty" className="py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 accent-text">Difficulty</Link>
               </div>
             )}
-            <Link to="/upload" className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
-              <span className="text-2xl">📤</span>
-              {isOpen && <span>Upload Scenario</span>}
+            <Link to="/upload" className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 accent-text">
+              <Upload className="w-5 h-5 accent-glow" />
+              {isOpen && <span className="accent-text">Upload Scenario</span>}
             </Link>
           </>
         )}

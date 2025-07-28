@@ -21,9 +21,14 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("theme") || "light";
-  });
+  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
+  const [accent, setAccent] = useState(() => localStorage.getItem("accent") || "cyan");
+
+  const accentMap = {
+    cyan: "#00ffff",
+    teal: "#0dffc9",
+    purple: "#bf00ff",
+  };
 
   useEffect(() => {
     document.documentElement.classList.remove("light", "dark");
@@ -31,12 +36,23 @@ export const ThemeProvider = ({ children }) => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
+  useEffect(() => {
+    document.documentElement.style.setProperty("--accent-color", accentMap[accent]);
+    localStorage.setItem("accent", accent);
+  }, [accent]);
+
   const toggleTheme = () => {
     setTheme(prev => (prev === "dark" ? "light" : "dark"));
   };
 
+  const cycleAccent = () => {
+    const colors = Object.keys(accentMap);
+    const idx = colors.indexOf(accent);
+    setAccent(colors[(idx + 1) % colors.length]);
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, accent, toggleTheme, cycleAccent }}>
       {children}
     </ThemeContext.Provider>
   );

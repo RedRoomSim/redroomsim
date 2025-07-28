@@ -42,12 +42,12 @@ const Layout = ({ children }) => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+    <div className="min-h-screen w-full overflow-x-hidden bg-white text-gray-900 dark:bg-gray-900 dark:text-white bg-[radial-gradient(#2d3748_1px,transparent_1px)] dark:bg-[radial-gradient(#4a5568_1px,transparent_1px)] bg-[length:20px_20px]">
       <div className="flex h-full">
         <Sidebar isOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         {sidebarOpen && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-40 z-30 sm:hidden"
+            className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm animate-fade z-30 sm:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
