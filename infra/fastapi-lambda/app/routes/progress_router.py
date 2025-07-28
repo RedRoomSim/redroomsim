@@ -165,6 +165,7 @@ def get_timeline(simulation_id: str):
                 "feedback": r.feedback,
                 "timeMs": r.time_ms,
                 "step_index": r.step_index,
+                "timestamp": r.created_at.isoformat() if r.created_at else None,
             }
             for r in records
         ]

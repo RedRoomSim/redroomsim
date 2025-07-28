@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply font-tech bg-gray-900 text-white;
+  @apply font-tech bg-gray-900 text-white overflow-x-auto;
 }
 
 /* Default accent color and helper classes */

@@ -140,6 +140,7 @@ const Simulation = () => {
         decision: optionText, // record the actual option text selected
         feedback: stepFeedback,
         timeMs: stepTime,
+        timestamp: new Date().toISOString(),
       },
     ]);
 
