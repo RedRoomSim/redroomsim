@@ -88,7 +88,7 @@ const Topbar = ({ sidebarOpen, toggleSidebar }) => {
       )}
 
       {/* Topbar */}
-      <div className="w-full flex items-center justify-between bg-white/60 dark:bg-gray-800/60 backdrop-blur-md text-gray-900 dark:text-white h-16 px-4 shadow-md transition-colors">
+      <div className="relative z-40 w-full flex items-center justify-between bg-white/60 dark:bg-gray-800/60 backdrop-blur-md text-gray-900 dark:text-white h-16 px-4 shadow-md transition-colors">
         <div className="flex items-center space-x-2">
           <button onClick={toggleSidebar} className="sm:hidden mr-2 focus:outline-none" aria-label="Toggle menu">
             <Menu className="w-6 h-6" />

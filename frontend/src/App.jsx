@@ -44,6 +44,7 @@ import ContactPage from "./pages/ContactPage";
 import HelpPage from "./pages/HelpPage";
 import NotFound from "./pages/NotFound";
 import Underconstruction from "./pages/UnderConstruction";
+import ScrollToTop from "./components/Shared/ScrollToTop";
 
 
 
@@ -54,6 +55,7 @@ const App = () => {
     <ThemeProvider>
       <AuthProvider>
         <Router>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<SecureRoute><RoleBasedRedirect /></SecureRoute>} />
             <Route path="/login" element={<LoginForm />} />
