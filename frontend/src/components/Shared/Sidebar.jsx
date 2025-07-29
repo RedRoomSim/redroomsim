@@ -68,7 +68,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         {role === "admin" && (
           <>
             <button
-              onClick={() => setAdminMenuOpen(!adminMenuOpen)}
+              onClick={() => {
+                if (!isOpen) {
+                  toggleSidebar();
+                  setAdminMenuOpen(true);
+                } else {
+                  setAdminMenuOpen(!adminMenuOpen);
+                }
+              }}
               className="flex items-center space-x-3 py-2 px-4 rounded hover:bg-gray-200 dark:hover:bg-gray-700 w-full text-left accent-text"
             >
               <Settings className="w-5 h-5 accent-glow" />
