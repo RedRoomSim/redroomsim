@@ -25,6 +25,7 @@ export const ThemeProvider = ({ children }) => {
   const [accent, setAccent] = useState(() => localStorage.getItem("accent") || "cyan");
 
   const accentMap = {
+    black: "#000000",
     cyan: "#00ffff",
     teal: "#0dffc9",
     purple: "#bf00ff",
@@ -38,6 +39,16 @@ export const ThemeProvider = ({ children }) => {
     pink: "#ff1493",
     gray: "#808080",
     brown: "#a52a2a",
+    lime: "#00ff00",
+    indigo: "#4b0082",
+    violet: "#ee82ee",
+    gold: "#ffd700",
+    silver: "#c0c0c0",
+    bronze: "#cd7f32",
+    navy: "#000080",
+    olive: "#808000",
+    maroon: "#800000",
+    coral: "#ff7f50",
   };
 
   useEffect(() => {

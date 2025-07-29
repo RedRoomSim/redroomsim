@@ -136,7 +136,7 @@ const handlePasswordReset = async () => {
 
         <div className="mb-4">
           <label className="block mb-2 font-semibold">Password</label>
-          <button onClick={() => setShowToast(true)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+          <button onClick={() => setShowToast(true)} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
             Reset Password
           </button>
         </div>

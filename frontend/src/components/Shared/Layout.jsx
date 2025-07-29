@@ -19,6 +19,9 @@ Changelog:
 
 // Import necessary libraries and components
 import React, { useState, useEffect } from "react";
+import { useTheme } from "../../context/ThemeContext";
+import lightBg from "../../assets/light-mode.png";
+import darkBg from "../../assets/dark-mode.png";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import ResponsiveContainer from "./ResponsiveContainer";
@@ -28,6 +31,7 @@ import ResponsiveContainer from "./ResponsiveContainer";
 **/
 const Layout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 640);
+  const { theme } = useTheme();
 
   // Close sidebar on small screens and handle resize events
   useEffect(() => {
@@ -42,7 +46,10 @@ const Layout = ({ children }) => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full overflow-x-auto bg-white text-gray-900 dark:bg-gray-900 dark:text-white bg-[radial-gradient(#2d3748_1px,transparent_1px)] dark:bg-[radial-gradient(#4a5568_1px,transparent_1px)] bg-[length:20px_20px]">
+    <div
+      className="min-h-screen w-full overflow-x-auto text-gray-900 dark:text-white bg-no-repeat bg-cover bg-fixed bg-center"
+      style={{ backgroundImage: `url(${theme === 'dark' ? darkBg : lightBg})` }}
+    >
       <div className="flex h-full">
         <Sidebar isOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         {sidebarOpen && (
@@ -54,7 +61,7 @@ const Layout = ({ children }) => {
 
         <div className={`flex flex-col flex-1 ml-0 transition-all duration-300 ${sidebarOpen ? 'sm:ml-64' : 'sm:ml-20'}`}>
           <Topbar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-          <div className="flex-1 overflow-auto bg-white dark:bg-gray-900 p-6">
+          <div className="relative z-10 flex-1 overflow-auto bg-white/25 dark:bg-gray-900/25 backdrop-blur-sm p-6">
             <ResponsiveContainer>
               {children}
             </ResponsiveContainer>
