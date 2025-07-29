@@ -194,7 +194,7 @@ const AdminAuditLog = () => {
             <button
               type="button"
               onClick={downloadExcel}
-              className="bg-blue-500 text-white px-3 py-1 rounded"
+              className=" bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition"
             >
               Download
             </button>

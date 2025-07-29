@@ -18,7 +18,7 @@ Changelog:
 */
 
 import React, { useState, useEffect } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ScoringBar from "../components/SimulationEngine/ScoringBar";
 import TimelineViewer from "../components/SimulationEngine/TimelineViewer";
@@ -27,6 +27,7 @@ import { useAuth } from "../context/AuthContext";
 const Simulation = () => {
   const { scenarioId } = useParams();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const initialStep = parseInt(searchParams.get("step")) || 0;
   const initialSimId = searchParams.get("simId");
   const [scenario, setScenario] = useState(null);
@@ -291,6 +292,12 @@ const Simulation = () => {
                 )}
 
                 <TimelineViewer timeline={timeline} />
+                <button
+                  onClick={() => navigate("/scenarios")}
+                  className="px-4 py-2 bg-red-600 text-white font-medium rounded hover:bg-red-700 transition"
+                >
+                  Return to Scenarios
+                </button>
               </div>
             ) : (
               <div className="bg-white dark:bg-gray-800 p-6 rounded shadow space-y-4">
@@ -329,7 +336,7 @@ const Simulation = () => {
                     <div className="flex justify-end">
                       <button
                         onClick={handleNextStep}
-                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
                       >
                         {retry ? "Retry" : "Next"} {/* show Retry when option allowed */}
                       </button>

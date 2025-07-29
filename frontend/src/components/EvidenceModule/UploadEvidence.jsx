@@ -55,7 +55,7 @@ const UploadEvidence = () => {
       <input type="file" onChange={handleFileChange} className="mb-4" />
       <button
         onClick={handleUpload}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800"
+        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
       >
         Upload
       </button>
