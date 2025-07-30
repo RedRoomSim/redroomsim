@@ -97,7 +97,7 @@ const Topbar = ({ sidebarOpen, toggleSidebar }) => {
             <img src={logo} alt="Logo" className="h-10 w-10 transition-transform hover:scale-105" />
           </Link>
           {!sidebarOpen && (
-            <h1 className="text-xl font-bold">Red Room Simulation</h1>
+            <h1 className="text-xl font-bold accent-text accent-glow">Red Room Simulation</h1>
           )}
         </div>
         <div className="flex items-center space-x-4">
