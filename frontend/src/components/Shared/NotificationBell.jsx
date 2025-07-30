@@ -52,10 +52,10 @@ const NotificationBell = () => {
   }, [role]);
 
   return (
-    <div className="relative">
+    <div className="relative flex items-center">
       <button
         onClick={() => setOpen(!open)}
-        className="relative accent-text opacity-80 hover:opacity-100"
+        className="relative accent-text accent-glow opacity-80 hover:opacity-100 flex items-center"
         title="Notifications"
       >
         <Bell
