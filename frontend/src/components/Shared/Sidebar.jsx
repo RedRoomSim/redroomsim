@@ -49,7 +49,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <Link to="/dashboard" title="Go to Dashboard">
             <img src={logo} alt="logo" className="h-12 w-12 transition-transform hover:scale-105" />
           </Link>
-          <h1 className="font-bold text-lg mt-2">Red Room Simulation</h1>
+          <h1 className="font-bold text-lg mt-2 accent-text accent-glow">Red Room Simulation</h1>
         </div>
       )}
 
