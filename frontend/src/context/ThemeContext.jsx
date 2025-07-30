@@ -22,7 +22,12 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
-  const [accent, setAccent] = useState(() => localStorage.getItem("accent") || "cyan");
+  const [accent, setAccent] = useState(() => {
+    const storedAccent = localStorage.getItem("accent");
+    if (storedAccent) return storedAccent;
+    const currentTheme = localStorage.getItem("theme") || "light";
+    return currentTheme === "dark" ? "cyan" : "red";
+  });
 
   const accentMap = {
     black: "#000000",
@@ -55,6 +60,7 @@ export const ThemeProvider = ({ children }) => {
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(theme);
     localStorage.setItem("theme", theme);
+    setAccent(theme === "dark" ? "cyan" : "red");
   }, [theme]);
 
   useEffect(() => {

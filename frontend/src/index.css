@@ -8,7 +8,7 @@ body {
 
 /* Default accent color and helper classes */
 :root {
-  --accent-color: #00ffff;
+  --accent-color: #ff0000;
 }
 
 .accent-text {

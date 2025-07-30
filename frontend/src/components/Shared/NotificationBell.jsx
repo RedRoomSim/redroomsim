@@ -68,7 +68,7 @@ const NotificationBell = () => {
         )}
       </button>
       {open && notifications.length > 0 && (
-        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg z-[60]">
+        <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg z-[60]">
           <ul className="p-2 text-sm text-gray-900 dark:text-white">
             {notifications.map(note => (
               <li key={note.id} className="py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
@@ -79,7 +79,7 @@ const NotificationBell = () => {
         </div>
       )}
       {open && notifications.length === 0 && (
-        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg z-[60]">
+        <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg z-[60]">
           <div className="p-2 text-sm text-gray-900 dark:text-white">No new notifications.</div>
         </div>
       )}
