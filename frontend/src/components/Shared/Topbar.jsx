@@ -96,7 +96,9 @@ const Topbar = ({ sidebarOpen, toggleSidebar }) => {
           <Link to="/dashboard" title="Go to Dashboard">
             <img src={logo} alt="Logo" className="h-10 w-10 transition-transform hover:scale-105" />
           </Link>
-          <h1 className="text-xl font-bold hidden sm:block">Red Room Simulation</h1>
+          {!sidebarOpen && (
+            <h1 className="text-xl font-bold">Red Room Simulation</h1>
+          )}
         </div>
         <div className="flex items-center space-x-4">
           <span className="hidden md:block font-mono text-sm accent-text accent-glow">{currentTime}</span>
