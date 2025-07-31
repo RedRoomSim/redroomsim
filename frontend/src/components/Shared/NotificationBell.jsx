@@ -4,11 +4,13 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase/firebaseConfig";
 import { useAuth } from "../../context/AuthContext";
 import { Bell } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const NotificationBell = () => {
   const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
   const { role } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,7 +39,7 @@ const NotificationBell = () => {
           notes.push({
             id: "scenario",
             message: "New scenario uploaded",
-            link: role === "admin" ? "/admin/scenario-config" : "/scenarios"
+            link: "/scenarios"
           });
         }
         localStorage.setItem("scenarioCount", String(scenarioCount));
@@ -71,8 +73,25 @@ const NotificationBell = () => {
         <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg z-[60]">
           <ul className="p-2 text-sm text-gray-900 dark:text-white">
             {notifications.map(note => (
-              <li key={note.id} className="py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
-                <a href={note.link}>{note.message}</a>
+              <li
+                key={note.id}
+                className="py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+              >
+                <button
+                  onClick={() => {
+
+                    if (note.id === "scenario") {
+                      setNotifications(prev =>
+                        prev.filter(n => n.id !== "scenario")
+                      );
+                    }
+                    navigate(note.link);
+                    setOpen(false);
+                  }}
+                  className="text-left w-full"
+                >
+                  {note.message}
+                </button>
               </li>
             ))}
           </ul>

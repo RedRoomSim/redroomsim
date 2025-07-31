@@ -20,6 +20,7 @@ Changelog:
  - Added support for user account locking after multiple failed login attempts.
  - Added user role updates after login.
  - Implemented user data fetching on authentication state change.
+ - Added automatic session expiration after inactivity and absolute timeout.
 */
 
 // import necessary libraries
@@ -50,6 +51,9 @@ export const AuthProvider = ({ children }) => {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const INACTIVITY_LIMIT = 30 * 60 * 1000; // 30 minutes
+  const ABSOLUTE_LIMIT = 24 * 60 * 60 * 1000; // 24 hours
+
 useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, async (user) => {
     if (user) {
@@ -60,6 +64,11 @@ useEffect(() => {
         setCurrentUser(user);
         setRole(data.role || "pending");
         setLoading(false);
+        if (!localStorage.getItem("loginTime")) {
+          const now = Date.now();
+          localStorage.setItem("loginTime", now.toString());
+          localStorage.setItem("lastActivity", now.toString());
+        }
       }
     } else {
       setCurrentUser(null);
@@ -69,6 +78,44 @@ useEffect(() => {
   });
   return () => unsubscribe();
 }, []);
+
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const updateActivity = () => {
+      localStorage.setItem("lastActivity", Date.now().toString());
+    };
+
+    const checkSession = async () => {
+      const now = Date.now();
+      const loginTime = parseInt(localStorage.getItem("loginTime") || "0");
+      const lastActivity = parseInt(localStorage.getItem("lastActivity") || "0");
+
+      if (loginTime && now - loginTime > ABSOLUTE_LIMIT) {
+        localStorage.setItem("logoutReason", "session_expired");
+        await logout();
+        return;
+      }
+
+      if (lastActivity && now - lastActivity > INACTIVITY_LIMIT) {
+        localStorage.setItem("logoutReason", "inactive");
+        await logout();
+      }
+    };
+
+    const events = ["mousemove", "mousedown", "keydown", "scroll", "touchstart"];
+    events.forEach((e) => window.addEventListener(e, updateActivity));
+
+    updateActivity();
+    checkSession();
+    const interval = setInterval(checkSession, 60 * 1000);
+
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, updateActivity));
+      clearInterval(interval);
+    };
+  }, [currentUser]);
 
 
   const login = async (email, password) => {
@@ -103,6 +150,10 @@ useEffect(() => {
 
     setCurrentUser(user);
     setRole(userData.role || "pending");
+
+    const now = Date.now();
+    localStorage.setItem("loginTime", now.toString());
+    localStorage.setItem("lastActivity", now.toString());
 
     // Step 4: Log login activity
     await axios.post("https://api.redroomsim.com/logs/log-login", {
@@ -160,6 +211,8 @@ useEffect(() => {
         role: role || "unknown",
       });
     }
+    localStorage.removeItem("loginTime");
+    localStorage.removeItem("lastActivity");
     return signOut(auth);
   };
   
