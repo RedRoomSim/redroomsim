@@ -20,7 +20,8 @@
   - Implemented dark mode support for better accessibility.
   - Added loading state during authentication process.
   - Implemented form validation for username and password fields.
-  - Fixed redirect logic to ensure users are redirected to the correct page after login.
+ - Fixed redirect logic to ensure users are redirected to the correct page after login.
+  - Displays session expiration message after automatic logout.
  */
  
  
@@ -35,6 +36,7 @@ const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [logoutMsg, setLogoutMsg] = useState("");
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -43,6 +45,15 @@ const LoginForm = () => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
+    const reason = localStorage.getItem("logoutReason");
+    if (reason === "inactive") {
+      setLogoutMsg("You have been logged out due to inactivity.");
+    } else if (reason === "session_expired") {
+      setLogoutMsg("Your session has expired. Please log in again.");
+    }
+    if (reason) {
+      localStorage.removeItem("logoutReason");
+    }
     // Automatically show form on mobile where scrolling may not trigger
     if (window.innerWidth <= 768) {
       setScrolled(true);
@@ -95,7 +106,7 @@ const LoginForm = () => {
         style={{ zIndex: 1 }}
     >
 
-        <div className="lg:w-1/2 lg:pr-10 mb-10 lg:mb-0 text-center lg:text-left">
+        <div className="lg:w-1/2 lg:pr-2 mb-10 lg:mb-0 text-center lg:text-left"> {/*hidden md:block">*/}
           <h1 className="text-4xl font-bold mb-6">
             Train Like a Real Analyst. Think Like a Threat Actor.
           </h1>
@@ -113,6 +124,7 @@ const LoginForm = () => {
           onSubmit={handleSubmit}
           className="bg-black bg-opacity-70 p-8 rounded shadow-md w-full lg:w-1/2 space-y-4"
         >
+          {logoutMsg && <div className="text-green-400 text-center">{logoutMsg}</div>}
           {error && <div className="text-red-400 text-center">{error}</div>}
           <input
             type="text"
