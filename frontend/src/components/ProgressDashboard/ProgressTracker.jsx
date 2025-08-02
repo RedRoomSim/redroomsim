@@ -124,7 +124,19 @@ const ProgressTracker = () => {
     fetchScenarios();
   }, []);
 
-  const sortedData = sortData(data);
+  const processedData = data.map((entry) => {
+    const steps = scenarioMap[entry.scenario_id]?.steps;
+    const hasScore =
+      steps && entry.score !== null && entry.score !== undefined;
+    const scorePct = hasScore
+      ? Math.round((entry.score / steps) * 100)
+      : null;
+    const result =
+      entry.completed && hasScore ? (scorePct >= 70 ? "Pass" : "Fail") : "-";
+    return { ...entry, scorePct, result };
+  });
+
+  const sortedData = sortData(processedData);
 
   return (
     <div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl shadow p-6">
@@ -149,9 +161,9 @@ const ProgressTracker = () => {
               <div className="flex items-center">
                 <span
                   className="cursor-pointer"
-                  onClick={() => handleSort('score')}
+                  onClick={() => handleSort('scorePct')}
                 >
-                  Score (%) {getSortSymbol('score')}
+                  Score (%) {getSortSymbol('scorePct')}
                 </span>
                 {/* Resizer removed */}
               </div>
@@ -173,30 +185,20 @@ const ProgressTracker = () => {
                   className="cursor-pointer"
                   onClick={() => handleSort('completed')}
                 >
-                  Status {getSortSymbol('status')}
+                  Status {getSortSymbol('completed')}
                 </span>
                 {/* Resizer removed */}
               </div>
             </th>
             <th style={{ width: columnWidths.timeline }} className="py-3 px-6 text-left">
               <div className="flex items-center">
-                <span
-                  className="cursor-pointer"
-                  onClick={() => handleSort('timeline')}
-                >
-                  Timeline {getSortSymbol('timeline')}
-                </span>
+                <span>Timeline</span>
                 {/* Resizer removed */}
               </div>
             </th>
             <th style={{ width: columnWidths.resume }} className="py-3 px-6 text-left">
               <div className="flex items-center">
-                <span
-                  className="cursor-pointer"
-                  onClick={() => handleSort('resume')}
-                >
-                  Resume {getSortSymbol('resume')}
-                </span>
+                <span>Resume</span>
                 {/* Resizer removed */}
               </div>
             </th>
@@ -210,31 +212,19 @@ const ProgressTracker = () => {
                 {entry.name || scenarioMap[entry.scenario_id]?.name || entry.scenario_id}
               </td>
               <td style={{ width: columnWidths.score }} className="py-3 px-6">
-                {(() => {
-                  const steps = scenarioMap[entry.scenario_id]?.steps;
-                  if (!steps || (entry.score === null || entry.score === undefined)) return "-";
-                  const pct = Math.round((entry.score / steps) * 100);
-                  return `${pct}%`;
-                })()}
+                {entry.scorePct !== null ? `${entry.scorePct}%` : "-"}
               </td>
               <td
                 style={{ width: columnWidths.result }}
-                className={(() => {
-                  if (!entry.completed) return "py-3 px-6 font-semibold text-gray-600";
-                  const steps = scenarioMap[entry.scenario_id]?.steps;
-                  if (!steps || (entry.score === null || entry.score === undefined))
-                    return "py-3 px-6 font-semibold text-gray-600";
-                  const pct = Math.round((entry.score / steps) * 100);
-                  return `py-3 px-6 font-semibold ${pct >= 70 ? "text-green-600" : "text-red-600"}`;
-                })()}
+                className={`py-3 px-6 font-semibold ${
+                  entry.result === "Pass"
+                    ? "text-green-600"
+                    : entry.result === "Fail"
+                    ? "text-red-600"
+                    : "text-gray-600"
+                }`}
               >
-                {(() => {
-                  if (!entry.completed) return "-";
-                  const steps = scenarioMap[entry.scenario_id]?.steps;
-                  if (!steps || (entry.score === null || entry.score === undefined)) return "-";
-                  const pct = Math.round((entry.score / steps) * 100);
-                  return pct >= 70 ? "Pass" : "Fail";
-                })()}
+                {entry.result}
               </td>
               <td style={{ width: columnWidths.status }} className={`py-3 px-6 font-semibold ${entry.completed ? "text-green-600" : "text-red-600"}`}>
                 {entry.completed ? "Completed" : "Incomplete"}

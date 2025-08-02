@@ -46,6 +46,20 @@ def save_progress(progress: ProgressIn):
             db.refresh(record)
             return {"simulation_id": record.sim_uuid}
         else:
+            # avoid creating duplicate progress entries for the same user and scenario
+            existing = (
+                db.query(SimulationProgress)
+                .filter_by(
+                    scenario_id=progress.scenario_id,
+                    username=progress.username,
+                    completed=False,
+                )
+                .order_by(SimulationProgress.created_at.desc())
+                .first()
+            )
+            if existing:
+                return {"simulation_id": existing.sim_uuid}
+
             sim_uuid = str(uuid.uuid4())
             record = SimulationProgress(
                 sim_uuid=sim_uuid,
