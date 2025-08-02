@@ -17,7 +17,7 @@ Changelog:
  - Dark mode support added
 */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ScoringBar from "../components/SimulationEngine/ScoringBar";
@@ -49,6 +49,7 @@ const Simulation = () => {
   const [retry, setRetry] = useState(false); // flag to retry when option leads to null
   const [mitreScores, setMitreScores] = useState({}); // cumulative MITRE ATT&CK counts
   const { user } = useAuth();
+  const initProgressRef = useRef(false); // guard against duplicate progress entries
 
   useEffect(() => {
     const fetchScenario = async () => {
@@ -73,7 +74,8 @@ const Simulation = () => {
   // initialize progress record when scenario and user are available
   useEffect(() => {
     const createProgress = async () => {
-      if (!user || !scenario || simulationId) return;
+      if (initProgressRef.current || !user || !scenario || simulationId) return;
+      initProgressRef.current = true;
       try {
         const response = await axios.post("https://api.redroomsim.com/progress/save", {
           scenario_id: scenarioId,
@@ -230,7 +232,7 @@ const Simulation = () => {
 
   useEffect(() => {
     return () => {
-      if (!completed && user && scenario) {
+      if (!completed && user && scenario && simulationId) {
         axios
           .post("https://api.redroomsim.com/progress/save", {
             scenario_id: scenarioId,
@@ -266,7 +268,7 @@ const Simulation = () => {
                 <p className="text-xl">
                   {endedEarly ? "Simulation Ended" : "🎉 Simulation Complete!"}
                 </p>
-                <p className="text-lg">Score: {score} / {scenario.steps.length}</p>
+                {/*<p className="text-lg">Score: {score} / {scenario.steps.length}</p>*/}
                 <p className="text-md text-gray-600 dark:text-gray-300">
                   Duration: {totalDurationSec} seconds
                 </p>
